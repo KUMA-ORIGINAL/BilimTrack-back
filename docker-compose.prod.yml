@@ -9,7 +9,6 @@ services:
       - .env.prod
     container_name: backend
     restart: always
-    entrypoint: /app/app_entrypoint.prod.sh
     expose:
       - 8000
     volumes:
@@ -17,7 +16,8 @@ services:
       - static_volume:/app/static
       - media_volume:/app/media
     depends_on:
-      - database
+      database:
+        condition: service_healthy
 
   database:
     image: postgres:16.2-alpine3.18

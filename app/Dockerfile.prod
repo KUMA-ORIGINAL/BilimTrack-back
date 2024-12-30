@@ -33,4 +33,7 @@ RUN pip install --no-cache /wheels/*
 # copy project
 COPY . $APP_HOME
 
-RUN chmod -R 777 $APP_HOME
+# Give execute permission to entrypoint script
+RUN chmod +x $APP_HOME/app_entrypoint.prod.sh
+
+ENTRYPOINT ["/app/app_entrypoint.prod.sh"]
