@@ -36,4 +36,4 @@ COPY . $APP_HOME
 # Give execute permission to entrypoint script
 RUN chmod +x $APP_HOME/app_entrypoint.prod.sh
 
-ENTRYPOINT ["/app/app_entrypoint.prod.sh"]
+CMD ["/app/app_entrypoint.prod.sh"]
