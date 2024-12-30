@@ -34,6 +34,8 @@ DEBUG = bool(env("DEBUG", default=0))
 
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
 
+DOMAIN = env("DOMAIN")
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = ["Authorization", "Content-Type", "Accept"]
@@ -165,7 +167,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ["http://api.bilim-track.makalabox.com/"]
+CSRF_TRUSTED_ORIGINS = [f"https://{DOMAIN}", f"http://{DOMAIN}"]
 
 AUTH_USER_MODEL = 'account.User'
 
