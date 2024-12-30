@@ -42,9 +42,11 @@ services:
     env_file: .env.prod
     ports:
       - '80:80'
+      - '433:433'
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
+      - certs:/etc/letsencrypt
     depends_on:
       - application
 
