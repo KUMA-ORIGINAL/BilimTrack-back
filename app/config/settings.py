@@ -165,7 +165,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ["https://api.makalabox.com"]
+CSRF_TRUSTED_ORIGINS = ["http://api.bilim-track.makalabox.com/"]
 
 AUTH_USER_MODEL = 'account.User'
 
