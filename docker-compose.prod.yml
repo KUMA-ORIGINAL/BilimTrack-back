@@ -9,7 +9,7 @@ services:
       - .env.prod
     container_name: backend
     restart: always
-    entrypoint: /app/application/app_entrypoint.prod.sh
+    entrypoint: /app/app_entrypoint.prod.sh
     expose:
       - 8000
     volumes:
