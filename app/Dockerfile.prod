@@ -30,7 +30,7 @@ COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
 RUN pip install --no-cache /wheels/*
 
-COPY ./entrypoint.prod.sh .
+COPY ./app_entrypoint.prod.sh .
 RUN sed -i 's/\r$//g' $APP_HOME/app_entrypoint.prod.sh
 RUN chmod +x $APP_HOME/app_entrypoint.prod.sh
 
