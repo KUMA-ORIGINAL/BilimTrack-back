@@ -54,3 +54,4 @@ volumes:
   database-storage:
   static_volume:
   media_volume:
+  certs:
