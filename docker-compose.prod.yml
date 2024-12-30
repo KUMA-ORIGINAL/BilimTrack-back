@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  application:
+    build:
+      context: app
+      dockerfile: Dockerfile.prod
+    env_file:
+      - .env.dev.prod
+    container_name: backend
+    restart: always
+    command: gunicorn config.wsgi --workers 3 --bind 0.0.0.0:8000 --timeout 120 --log-level info
+    expose:
+      - 8000
+    volumes:
+      - ./app:/app/application
+      - static_volume:/app/application/static
+      - media_volume:/app/application/media
+    depends_on:
+      - database
+      - redis
+
+  asgi-application:
+    build:
+      context: app
+      dockerfile: Dockerfile.prod
+    env_file:
+      - .env.dev.prod
+    container_name: asgi-backend
+    restart: always
+    command: daphne -u /tmp/daphne.sock config.asgi:application -b 0.0.0.0 -p 9000
+    expose:
+      - 9000
+    volumes:
+      - ./app:/app/application
+    depends_on:
+      - database
+      - redis
+
+  database:
+    image: postgres:16.2-alpine3.18
+    env_file: .env.dev.prod
+    restart: unless-stopped
+    volumes:
+      - database-storage:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+  nginx:
+    build: nginx
+    ports:
+      - '80:80'
+    volumes:
+      - static_volume:/app/application/static
+      - media_volume:/app/application/media
+    depends_on:
+      - application
+      - asgi-application
+
+volumes:
+  database-storage:
+  static_volume:
+  media_volume:
