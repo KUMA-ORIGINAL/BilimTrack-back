@@ -36,7 +36,11 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=100, verbose_name=_("First Name"), blank=True)
     last_name = models.CharField(max_length=100, verbose_name=_("Last Name"), blank=True)
     photo = models.ImageField(upload_to='user_photos/', blank=True)
-    role = models.CharField(max_length=15, choices=ROLE_CHOICES, default='writer')
+    role = models.CharField(max_length=15, choices=ROLE_CHOICES, default='student')
+
+    achievements = models.ManyToManyField('Achievement', related_name='users', blank=True)
+    group = models.ForeignKey('academics.Group', on_delete=models.CASCADE,
+                              related_name='users', blank=True, null=True)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
