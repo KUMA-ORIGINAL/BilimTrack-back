@@ -5,7 +5,7 @@ from pilkit.processors import ResizeToFill
 
 class Group(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    rules = models.TextField(blank=True, null=True, help_text="Правила для группы")
+    rules = models.JSONField(blank=True, null=True, help_text="Правила для группы")
     contract = ProcessedImageField(upload_to='contracts/%Y',
                                    processors=[ResizeToFill(500, 500)],
                                    format='JPEG',
