@@ -22,7 +22,8 @@ class UserAdmin(UserAdmin):
         ("Dates", {"fields": ("last_login", "date_joined")}),
         ('required', {
                  'fields': ('email', 'first_name', 'last_name', 'role',
-                            'photo', 'achievements', 'group')}),
+                            'photo', 'achievements', 'group', 'achievements_count',
+                            'points', 'rating')}),
     )
     add_fieldsets = (
         (
@@ -44,3 +45,4 @@ class UserAdmin(UserAdmin):
 
     list_display = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'group', 'is_active')
     list_display_links = ('id', 'username')
+    filter_horizontal = ('achievements',)

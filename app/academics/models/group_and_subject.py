@@ -5,19 +5,25 @@ from pilkit.processors import ResizeToFill
 
 class Group(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    rules = models.TextField(blank=True, null=True, help_text="Правила для группы")
+    rules = models.JSONField(blank=True, null=True, help_text="Правила для группы")
     contract = ProcessedImageField(upload_to='contracts/%Y',
                                    processors=[ResizeToFill(500, 500)],
                                    format='JPEG',
                                    options={'quality': 60},
                                    blank=True)
+    points = models.PositiveIntegerField(default=0, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ['name']
+        ordering = ['-points']
+
+    def update_group_points(self):
+        total_points = self.users.aggregate(total=models.Sum('points'))['total'] or 0
+        self.points = total_points
+        self.save()
 
 
 class Subject(models.Model):

@@ -3,6 +3,8 @@ from django.db import models
 
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+from imagekit.models import ProcessedImageField
+from pilkit.processors import ResizeToFill
 
 
 class UserManager(BaseUserManager):
@@ -35,8 +37,15 @@ class User(AbstractUser):
     email = models.EmailField(_("email address"), blank=True)
     first_name = models.CharField(max_length=100, verbose_name=_("First Name"), blank=True)
     last_name = models.CharField(max_length=100, verbose_name=_("Last Name"), blank=True)
-    photo = models.ImageField(upload_to='user_photos/', blank=True)
+    photo = ProcessedImageField(upload_to='user_photos/%Y/%m',
+                                processors=[ResizeToFill(500, 500)],
+                                format='JPEG',
+                                options={'quality': 60},
+                                blank=True)
     role = models.CharField(max_length=15, choices=ROLE_CHOICES, default='student')
+    achievements_count = models.PositiveIntegerField(default=0, blank=True)
+    points = models.PositiveIntegerField(default=0, blank=True)
+    rating = models.PositiveIntegerField(default=0, blank=True)
 
     achievements = models.ManyToManyField('Achievement', related_name='users', blank=True)
     group = models.ForeignKey('academics.Group', on_delete=models.CASCADE,
@@ -56,4 +65,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.full_name
-

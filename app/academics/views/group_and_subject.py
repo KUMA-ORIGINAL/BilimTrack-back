@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -7,7 +7,13 @@ from ..models import Group, Subject
 from ..serializers import GroupSerializer, SubjectSerializer
 
 @extend_schema(tags=['Group and Subject'])
-class GroupViewSet(viewsets.GenericViewSet):
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список групп отсортированных по баллам'
+    ),
+)
+class GroupViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
