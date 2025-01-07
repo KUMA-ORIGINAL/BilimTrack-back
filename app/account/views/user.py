@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets, mixins, permissions, generics
+from rest_framework.generics import get_object_or_404
 
 from ..serializers import UserListSerializer, MeSerializer, MeUpdateSerializer
 
@@ -19,14 +20,23 @@ class MeViewSet(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+@extend_schema(tags=['Users'], summary='Получение профиля пользователя по username')
+class UserViewSet(generics.RetrieveAPIView):
+    serializer_class = MeSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-@extend_schema(tags=['Users'])
+    def get_object(self):
+        """Возвращает объект пользователя по его username"""
+        username = self.kwargs.get('username')
+        return get_object_or_404(User, username=username)
+
+
+@extend_schema(tags=['Users rating'])
 @extend_schema_view(
     list=extend_schema(summary='Получение студентов отсортированных по баллам')
 )
-class UserViewSet(viewsets.GenericViewSet,
+class UserRatingViewSet(viewsets.GenericViewSet,
                   mixins.ListModelMixin):
     serializer_class = UserListSerializer
     queryset = User.objects.filter(role='student').order_by('-points')
     permission_classes = [permissions.IsAuthenticated]
-
