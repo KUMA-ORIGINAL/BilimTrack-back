@@ -34,6 +34,7 @@ class Subject(models.Model):
                                 format='JPEG',
                                 options={'quality': 60},
                                 blank=True)
+    makalabox_url = models.URLField(blank=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='subjects')
     created_at = models.DateTimeField(auto_now_add=True)
 

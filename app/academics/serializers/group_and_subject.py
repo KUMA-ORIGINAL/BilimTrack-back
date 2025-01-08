@@ -10,7 +10,7 @@ class SubjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subject
-        fields = ['id', 'name', 'description', 'photo', 'group', 'created_at']
+        fields = ['id', 'name', 'description', 'photo', 'group', 'created_at', 'makalabox_url']
 
 class GroupSerializer(serializers.ModelSerializer):
     subjects = SubjectSerializer(many=True, read_only=True)
