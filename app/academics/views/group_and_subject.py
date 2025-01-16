@@ -4,7 +4,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from ..models import Group, Subject
-from ..serializers import GroupSerializer, SubjectSerializer, GroupListSerializer
+from ..serializers import GroupSerializer, SubjectSerializer, \
+    SubjectListSerializer
+
 
 @extend_schema(tags=['Group'])
 @extend_schema_view()
@@ -30,6 +32,11 @@ class SubjectViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return SubjectListSerializer
+        return SubjectSerializer
 
     @action(detail=False, methods=['get'], url_path='me', url_name='me')
     def me(self, request):

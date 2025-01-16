@@ -24,3 +24,10 @@ class GroupListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'name', 'points']
+
+
+class SubjectListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subject
+        fields = ['id', 'name']
