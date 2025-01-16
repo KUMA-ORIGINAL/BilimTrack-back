@@ -6,22 +6,12 @@ from rest_framework.response import Response
 from ..models import Group, Subject
 from ..serializers import GroupSerializer, SubjectSerializer, GroupListSerializer
 
-@extend_schema(tags=['Group and Subject'])
-@extend_schema_view(
-    list=extend_schema(
-        summary='Получить список групп отсортированных по баллам'
-    ),
-)
-class GroupViewSet(viewsets.GenericViewSet,
-                   mixins.ListModelMixin):
+@extend_schema(tags=['Group'])
+@extend_schema_view()
+class GroupViewSet(viewsets.GenericViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-    def get_serializer_class(self):
-        if self.action in ('retrieve',):
-            return GroupSerializer
-        return GroupListSerializer
 
     @action(detail=False, methods=['get'], url_path='me', url_name='me')
     def me(self, request):
@@ -35,8 +25,8 @@ class GroupViewSet(viewsets.GenericViewSet,
         return Response(group_serializer.data)
 
 
-@extend_schema(tags=['Group and Subject'])
-class SubjectViewSet(viewsets.GenericViewSet):
+@extend_schema(tags=['Subject'])
+class SubjectViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
     permission_classes = [permissions.IsAuthenticated]

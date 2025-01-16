@@ -12,6 +12,7 @@ class Group(models.Model):
                                    options={'quality': 60},
                                    blank=True)
     points = models.PositiveIntegerField(default=0, blank=True)
+    subjects = models.ManyToManyField('Subject', related_name='groups')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -35,12 +36,10 @@ class Subject(models.Model):
                                 options={'quality': 60},
                                 blank=True)
     makalabox_url = models.URLField(blank=True)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='subjects')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.name} ({self.group.name})"
+        return f"{self.name}"
 
     class Meta:
-        unique_together = ('name', 'group')
         ordering = ['name']
