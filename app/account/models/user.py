@@ -64,4 +64,4 @@ class User(AbstractUser):
         ordering = ('-date_joined',)
 
     def __str__(self):
-        return self.full_name
+        return f'{self.username}-{self.full_name}'
