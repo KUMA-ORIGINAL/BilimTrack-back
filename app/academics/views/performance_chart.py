@@ -21,19 +21,19 @@ class PerformanceChartView(APIView):
     def get(self, request):
         user = request.user
 
-        # Aggregate grades by date (truncating time) and sum the grades for each day
         grades = Grade.objects.filter(user=user) \
             .annotate(date=TruncDate('created_at')) \
             .values('date') \
             .annotate(total_score=Sum('grade')) \
             .order_by('date')
 
-        # Prepare chart data
         chart_data = []
         for grade in grades:
             chart_data.append({
-                'date': grade['date'].strftime('%d-%m'),
+                'date': grade['date'].strftime('%Y-%m-%d'),
                 'score': grade['total_score'],
             })
 
-        return Response(chart_data)
+        serialized_data = PerformanceChartSerializer(chart_data, many=True).data
+
+        return Response(serialized_data)

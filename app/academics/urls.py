@@ -10,5 +10,5 @@ router.register(r'rating', RatingViewSet, basename='rating')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('perfomance-chart/me/', PerformanceChartView.as_view()),
+    path('performance-chart/me/', PerformanceChartView.as_view()),
 ]

@@ -30,4 +30,4 @@ class SubjectListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subject
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'description', 'photo',]
