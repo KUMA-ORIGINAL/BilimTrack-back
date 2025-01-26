@@ -30,38 +30,84 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     ROLE_CHOICES = (
-        ('student', 'Student'),
-        ('mentor', 'Mentor'),
+        ('student', 'Студент'),
+        ('mentor', 'Ментор'),
     )
 
-    email = models.EmailField(_("email address"), blank=True)
-    first_name = models.CharField(max_length=100, verbose_name=_("First Name"), blank=True)
-    last_name = models.CharField(max_length=100, verbose_name=_("Last Name"), blank=True)
-    photo = ProcessedImageField(upload_to='user_photos/%Y/%m',
-                                processors=[ResizeToFill(500, 500)],
-                                format='JPEG',
-                                options={'quality': 60},
-                                blank=True)
-    role = models.CharField(max_length=15, choices=ROLE_CHOICES, default='student')
-    achievements_count = models.PositiveIntegerField(default=0, blank=True)
-    points = models.PositiveIntegerField(default=0, blank=True)
-    rating = models.PositiveIntegerField(default=0, blank=True)
+    email = models.EmailField(_("Адрес электронной почты"), blank=True)
+    first_name = models.CharField(max_length=100, verbose_name=_("Имя"), blank=True)
+    last_name = models.CharField(max_length=100, verbose_name=_("Фамилия"), blank=True)
+    photo = ProcessedImageField(
+        upload_to='user_photos/%Y/%m',
+        processors=[ResizeToFill(500, 500)],
+        format='JPEG',
+        options={'quality': 60},
+        blank=True,
+        verbose_name=_("Фотография")
+    )
+    role = models.CharField(
+        max_length=15,
+        choices=ROLE_CHOICES,
+        default='student',
+        verbose_name=_("Роль")
+    )
+    achievements_count = models.PositiveIntegerField(
+        default=0,
+        blank=True,
+        verbose_name=_("Количество достижений")
+    )
+    points = models.PositiveIntegerField(
+        default=0,
+        blank=True,
+        verbose_name=_("Баллы")
+    )
+    rating = models.PositiveIntegerField(
+        default=0,
+        blank=True,
+        verbose_name=_("Рейтинг")
+    )
 
-    achievements = models.ManyToManyField('Achievement', related_name='users', blank=True)
-    group = models.ForeignKey('academics.Group', on_delete=models.CASCADE,
-                              related_name='users', blank=True, null=True)
+    biography = models.TextField(
+        blank=True,
+        verbose_name=_("Биография")
+    )
+
+    tools = models.ManyToManyField(
+        'Tool',
+        related_name='users',
+        blank=True,
+        verbose_name=_("Инструменты")
+    )
+
+    achievements = models.ManyToManyField(
+        'Achievement',
+        related_name='users',
+        blank=True,
+        verbose_name=_("Достижения")
+    )
+
+    group = models.ForeignKey(
+        'academics.Group',
+        on_delete=models.CASCADE,
+        related_name='users',
+        blank=True,
+        null=True,
+        verbose_name=_("Группа")
+    )
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
+
+    objects = UserManager()
 
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
-    objects = UserManager()
-
     class Meta:
         ordering = ('-date_joined',)
+        verbose_name = _("Пользователь")
+        verbose_name_plural = _("Пользователи")
 
     def __str__(self):
-        return f'{self.username}-{self.full_name}'
+        return f'{self.username} - {self.full_name}'

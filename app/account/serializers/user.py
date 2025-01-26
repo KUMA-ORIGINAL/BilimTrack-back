@@ -5,20 +5,40 @@ from rest_framework import serializers
 
 from academics.models import Grade
 from academics.serializers import PerformanceChartSerializer
+from .skill import SkillSerializer
+from .tool import ToolSerializer
 from .achievement_and_rarity import AchievementSerializer
 
 User = get_user_model()
+
 
 class MeSerializer(serializers.ModelSerializer):
     achievements = AchievementSerializer(many=True)
     group = serializers.StringRelatedField()
     performance = serializers.SerializerMethodField()
+    skills = SkillSerializer(many=True)
+    tools = ToolSerializer(many=True)
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name',
-                  'photo', 'role', 'group', 'achievements_count', 'points', 'rating',
-                  'achievements', 'performance')
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        if instance.role == 'student':
+            allowed_fields = (
+                'id', 'email', 'username', 'first_name', 'last_name',
+                'photo', 'role', 'group', 'achievements_count', 'points', 'rating',
+                'achievements', 'performance')
+        elif instance.role == 'mentor':
+            allowed_fields = (
+                'username', 'first_name', 'last_name', 'email', 'biography',
+                'skills', 'tools')
+        else:
+            allowed_fields = ('username', 'first_name', 'last_name')
+
+        return {field: representation[field] for field in allowed_fields if field in representation}
 
     def get_performance(self, obj):
         grades = Grade.objects.filter(user=obj) \
@@ -37,6 +57,7 @@ class MeSerializer(serializers.ModelSerializer):
         serialized_data = PerformanceChartSerializer(chart_data, many=True).data
 
         return serialized_data
+
 
 class MeUpdateSerializer(serializers.ModelSerializer):
     class Meta:

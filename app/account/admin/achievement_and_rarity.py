@@ -1,17 +1,19 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
+from unfold.admin import ModelAdmin as UnfoldModelAdmin
+
 from ..models import Rarity, Achievement
 
 
 @admin.register(Rarity)
-class RarityAdmin(admin.ModelAdmin):
+class RarityAdmin(UnfoldModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
 
 
 @admin.register(Achievement)
-class AchievementAdmin(admin.ModelAdmin):
+class AchievementAdmin(UnfoldModelAdmin):
     list_display = ('name', 'rarity', 'created_at', 'photo_thumbnail')
     list_filter = ('rarity',)
     search_fields = ('name', 'description')

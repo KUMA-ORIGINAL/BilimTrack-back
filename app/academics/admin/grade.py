@@ -1,10 +1,12 @@
 from django.contrib import admin
 
+from unfold.admin import ModelAdmin as UnfoldModelAdmin
+
 from academics.models import Grade
 
 
 @admin.register(Grade)
-class GradeAdmin(admin.ModelAdmin):
+class GradeAdmin(UnfoldModelAdmin):
     list_display = ('user', 'subject', 'grade', 'comment', 'created_at', 'updated_at')  # отображаемые поля
     list_filter = ('subject', 'grade', 'created_at')  # фильтрация по предметам, оценкам, дате
     search_fields = ('user__username', 'subject__name')  # добавляем поиск по имени пользователя и названию предмета

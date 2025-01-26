@@ -23,7 +23,6 @@ class MeViewSet(generics.RetrieveUpdateAPIView):
 @extend_schema(tags=['Users'], summary='Получение профиля пользователя по username')
 class UserViewSet(generics.RetrieveAPIView):
     serializer_class = MeSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         """Возвращает объект пользователя по его username"""

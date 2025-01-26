@@ -1,10 +1,25 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin, GroupAdmin
+from django.contrib.auth.models import Group
 
-from ..models import User
+from unfold.admin import ModelAdmin as UnfoldModelAdmin, TabularInline
+from unfold.forms import UserChangeForm, UserCreationForm, AdminPasswordChangeForm
+
+from ..models import User, Skill
+
+admin.site.unregister(Group)
+
+
+class SkillTabularAdmin(TabularInline):
+    model = Skill
+
 
 @admin.register(User)
-class UserAdmin(UserAdmin):
+class UserAdmin(UserAdmin, UnfoldModelAdmin):
+    form = UserChangeForm
+    add_form = UserCreationForm
+    change_password_form = AdminPasswordChangeForm
+
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (
@@ -23,7 +38,7 @@ class UserAdmin(UserAdmin):
         ('required', {
                  'fields': ('email', 'first_name', 'last_name', 'role',
                             'photo', 'achievements', 'group', 'achievements_count',
-                            'points', 'rating')}),
+                            'points', 'rating', 'tools')}),
     )
     add_fieldsets = (
         (
@@ -45,4 +60,10 @@ class UserAdmin(UserAdmin):
 
     list_display = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'group', 'is_active')
     list_display_links = ('id', 'username')
-    filter_horizontal = ('achievements',)
+    filter_horizontal = ('achievements', 'tools')
+    inlines = [SkillTabularAdmin]
+
+
+@admin.register(Group)
+class GroupAdmin(GroupAdmin, UnfoldModelAdmin):
+    pass
