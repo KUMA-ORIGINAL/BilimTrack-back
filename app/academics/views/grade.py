@@ -1,14 +1,32 @@
+from collections import defaultdict
+
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, mixins, generics
+from rest_framework.response import Response
 
 from ..models import Grade
-from ..serializers import GradeSerializer
+from ..permissions import IsMentorOrReadOnly
+from ..serializers import GradeSerializer, StudentGradeSerializer
 
-@extend_schema(tags=['Grade'])
-class GradeViewSet(viewsets.ModelViewSet):
+
+@extend_schema(tags=['Grade Mentor'])
+class GradeMentorViewSet(viewsets.ModelViewSet):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsMentorOrReadOnly]
     filter_backends = [DjangoFilterBackend,]
-    filterset_fields = ['subject__id']
+    filterset_fields = ['subject_id']
+
+
+@extend_schema(tags=['Grade student me'])
+class GradeStudentAPIView(generics.ListAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = StudentGradeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['subject_id']
+
+    def get_queryset(self):
+        # Отфильтровываем оценки только для текущего пользователя
+        return Grade.objects.filter(user=self.request.user)

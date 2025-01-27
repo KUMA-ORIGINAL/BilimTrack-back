@@ -8,22 +8,24 @@ User = get_user_model()
 class Grade(models.Model):
     GRADE_CHOICES = [
         (0, 'Не был'),
+        (1, 'Оценка 1'),
+        (2, 'Оценка 2'),
+        (3, 'Оценка 3'),
+        (4, 'Оценка 4'),
+        (5, 'Оценка 5'),
+        (6, 'Оценка 6'),
+        (7, 'Оценка 7'),
+        (8, 'Оценка 8'),
+        (9, 'Оценка 9'),
         (10, 'Оценка 10'),
-        (20, 'Оценка 20'),
-        (30, 'Оценка 30'),
-        (40, 'Оценка 40'),
-        (50, 'Оценка 50'),
-        (60, 'Оценка 60'),
-        (70, 'Оценка 70'),
-        (80, 'Оценка 80'),
-        (90, 'Оценка 90'),
-        (100, 'Оценка 100'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     grade = models.IntegerField(choices=GRADE_CHOICES)
+    date = models.DateField()
     comment = models.TextField(blank=True, null=True)
+
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
 

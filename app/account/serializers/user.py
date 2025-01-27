@@ -33,7 +33,7 @@ class MeSerializer(serializers.ModelSerializer):
                 'achievements', 'performance')
         elif instance.role == 'mentor':
             allowed_fields = (
-                'username', 'first_name', 'last_name', 'email', 'biography',
+                'username', 'first_name', 'last_name', 'email', 'photo', 'biography',
                 'skills', 'tools')
         else:
             allowed_fields = ('username', 'first_name', 'last_name')
