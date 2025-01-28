@@ -1,7 +1,14 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from ..models import Grade
-from collections import defaultdict
+
+User = get_user_model()
+
+class UserShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'full_name', 'username')
 
 
 class GradeSerializer(serializers.ModelSerializer):
@@ -10,17 +17,12 @@ class GradeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class StudentGradeSerializer(serializers.Serializer):
-    name = serializers.CharField(source='user.get_full_name')
-    username = serializers.CharField(source='user.username')
-    scores = serializers.SerializerMethodField()
+class GradeShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        fields = ('id', 'date', 'grade')
 
-    def get_scores(self, obj):
-        # Собираем все оценки для текущего пользователя
-        scores = {}
-        grades = Grade.objects.filter(user=obj.user, subject=obj.subject)  # Получаем все оценки для
-        # пользователя
-        for grade in grades:
-            date_str = grade.date.strftime('%d.%m')  # Форматируем дату в нужный формат
-            scores[date_str] = grade.grade
-        return scores
+
+class StudentGradeSerializer(serializers.Serializer):
+    user = UserShortSerializer(read_only=True)
+    scores = GradeShortSerializer(many=True)

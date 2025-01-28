@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import (GroupViewSet, SubjectViewSet, GradeMentorViewSet, GradeStudentAPIView,
+from .views import (GroupViewSet, SubjectViewSet, GradeMentorViewSet, StudentGradeAPIView,
                     RatingViewSet,
                     PerformanceChartView)
 
@@ -12,6 +12,6 @@ router.register(r'rating', RatingViewSet, basename='rating')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('student-grades/me/',GradeStudentAPIView.as_view()),
+    path('student-grades/me/',StudentGradeAPIView.as_view()),
     path('performance-chart/me/', PerformanceChartView.as_view()),
 ]
