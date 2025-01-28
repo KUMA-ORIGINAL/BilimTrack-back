@@ -42,7 +42,6 @@ class MeSerializer(serializers.ModelSerializer):
 
     def get_performance(self, obj):
         grades = Grade.objects.filter(user=obj) \
-            .annotate(date=TruncDate('created_at')) \
             .values('date') \
             .annotate(total_score=Sum('grade')) \
             .order_by('date')
