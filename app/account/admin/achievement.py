@@ -3,13 +3,7 @@ from django.utils.html import format_html
 
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
-from ..models import Rarity, Achievement
-
-
-@admin.register(Rarity)
-class RarityAdmin(UnfoldModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
+from ..models import Achievement
 
 
 @admin.register(Achievement)

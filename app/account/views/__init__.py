@@ -1,2 +1,3 @@
-from .achievement_and_rarity import *
+from .achievement import *
+from .rarity import *
 from .user import *

@@ -7,7 +7,7 @@ from academics.models import Grade
 from academics.serializers import PerformanceChartSerializer
 from .skill import SkillSerializer
 from .tool import ToolSerializer
-from .achievement_and_rarity import AchievementSerializer
+from .achievement import AchievementSerializer
 
 User = get_user_model()
 

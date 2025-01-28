@@ -1,2 +1,3 @@
-from .group_and_subject import *
+from .subject import *
 from .grade import *
+from .group import *

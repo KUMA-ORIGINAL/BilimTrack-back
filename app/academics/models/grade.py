@@ -20,17 +20,19 @@ class Grade(models.Model):
         (10, 'Оценка 10'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    grade = models.IntegerField(choices=GRADE_CHOICES)
-    date = models.DateField()
-    comment = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
+    grade = models.IntegerField(choices=GRADE_CHOICES, verbose_name='Оценка')
+    date = models.DateField(verbose_name='Дата')
+    comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
 
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    created_at = models.DateField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateField(auto_now=True, verbose_name='Дата обновления')
 
     class Meta:
         ordering = ('-created_at',)
+        verbose_name = 'Оценка'
+        verbose_name_plural = 'Оценки'
 
     def __str__(self):
         return f"{self.user.username} - {self.grade}"
