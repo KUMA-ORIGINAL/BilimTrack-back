@@ -1,21 +1,23 @@
 from django.contrib import admin
-from django.utils.html import format_html
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
+from unfold.decorators import display
 
 from ..models import Achievement
 
 
 @admin.register(Achievement)
 class AchievementAdmin(UnfoldModelAdmin):
-    list_display = ('name', 'rarity', 'created_at', 'photo_thumbnail')
+    list_display = ('name', 'rarity', 'created_at', 'display_photo')
     list_filter = ('rarity',)
     search_fields = ('name', 'description')
-    readonly_fields = ('created_at', 'photo_thumbnail')
+    readonly_fields = ('created_at',)
 
-    def photo_thumbnail(self, obj):
+    @display(description=_("Фото"))
+    def display_photo(self, obj):
         if obj.photo:
-            return format_html('<img src="{}" width="100" height="100" />', obj.photo.url)
-        return "Нет изображения"
-
-    photo_thumbnail.short_description = 'Миниатюра'
+            return mark_safe(
+                f'<img src="{obj.photo.url}" height="120" width="120" '
+                f'style="border-radius: 10%;" />')

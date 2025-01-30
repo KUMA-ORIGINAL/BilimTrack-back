@@ -35,10 +35,12 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin):
             },
         ),
         ("Dates", {"fields": ("last_login", "date_joined")}),
-        ('required', {
-                 'fields': ('email', 'first_name', 'last_name', 'role',
-                            'photo', 'achievements', 'group', 'achievements_count',
-                            'points', 'rating', 'tools')}),
+        ("Общее", {"fields": ('email', 'first_name', 'last_name', 'role', 'photo', )}),
+        ('Для студента', {
+            'fields': ('achievements', 'group', 'achievements_count',
+                        'points', 'rating')}),
+        ('Для ментора', {
+            'fields': ('tools',)}),
     )
     add_fieldsets = (
         (
