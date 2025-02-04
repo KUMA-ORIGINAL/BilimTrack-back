@@ -13,7 +13,7 @@ User = get_user_model()
 @extend_schema(tags=['Rating'])
 @extend_schema_view(
     groups=extend_schema(
-        summary='Получение студентов отсортированных по баллам',
+        summary='Получить список групп отсортированных по баллам',
         responses=GroupListSerializer,
         parameters=[
             OpenApiParameter(
@@ -23,7 +23,7 @@ User = get_user_model()
         )]
     ),
     users=extend_schema(
-        summary='Получить список групп отсортированных по баллам',
+        summary='Получение студентов отсортированных по баллам',
         responses=UserListSerializer,
         parameters=[
             OpenApiParameter(

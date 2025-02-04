@@ -6,8 +6,8 @@
 #password = 123user123
 
 #
-POST http://localhost:8000/api/jwt/create/
+POST https://api.bilim-track.makalabox.com/api/jwt/create/
 Content-Type: application/x-www-form-urlencoded
 
-username = user2 &
-password = 123user123
+username = admin &
+password = admin
