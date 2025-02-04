@@ -21,11 +21,10 @@ class PerformanceChartView(APIView):
     def get(self, request):
         user = request.user
 
-        grades = Grade.objects.filter(user=user) \
-            .annotate(date=TruncDate('created_at')) \
-            .values('date') \
-            .annotate(total_score=Sum('grade')) \
-            .order_by('date')
+        grades = (Grade.objects.filter(user=user)
+                  .values('date').
+                  annotate(total_score=Sum('grade'))
+                  .order_by('date'))
 
         chart_data = []
         for grade in grades:
