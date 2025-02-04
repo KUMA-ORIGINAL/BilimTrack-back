@@ -24,6 +24,9 @@ class Group(models.Model):
         verbose_name_plural = 'Группы'
 
     def update_group_points(self):
-        total_points = self.users.aggregate(total=models.Sum('points'))['total'] or 0
+        total_points = 0
+        for user in self.users.all():
+            user_points = user.grade_set.aggregate(total=models.Sum('grade'))['total'] or 0
+            total_points += user_points
         self.points = total_points
         self.save()

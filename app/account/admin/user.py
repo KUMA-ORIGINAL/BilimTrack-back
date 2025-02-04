@@ -60,7 +60,7 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin):
 
     ordering = ['date_joined']
 
-    list_display = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'group', 'is_active')
+    list_display = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'group', 'points')
     list_display_links = ('id', 'username')
     filter_horizontal = ('achievements', 'tools')
     inlines = [SkillTabularAdmin]
