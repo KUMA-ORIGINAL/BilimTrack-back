@@ -64,6 +64,7 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin):
     list_display_links = ('id', 'username')
     filter_horizontal = ('achievements', 'tools')
     inlines = [SkillTabularAdmin]
+    list_per_page = 20
 
 
 @admin.register(Group)
