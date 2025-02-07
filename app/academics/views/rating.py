@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Max
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
@@ -42,9 +43,13 @@ class RatingViewSet(viewsets.GenericViewSet):
         subject_id = request.query_params.get('subject_id')
 
         if subject_id:
-            groups = Group.objects.filter(subjects__id=subject_id).order_by('-points')
+            groups = Group.objects.filter(subjects__id=subject_id) \
+                .annotate(last_grade_date=Max('users__grade__date')) \
+                .order_by('-points', '-last_grade_date')
         else:
-            groups = Group.objects.all().order_by('-points')
+            groups = Group.objects.annotate(last_grade_date=Max('users__grade__date')) \
+                .order_by('-points', '-last_grade_date')
+
         groups_serializer = GroupListSerializer(groups, many=True)
         return Response(groups_serializer.data)
 
@@ -53,9 +58,13 @@ class RatingViewSet(viewsets.GenericViewSet):
         subject_id = request.query_params.get('subject_id')
 
         if subject_id:
-            users = User.objects.filter(role='student', group__subjects__id=subject_id).order_by(
-                '-points').distinct()
+            users = User.objects.filter(role='student', group__subjects__id=subject_id) \
+                .annotate(last_grade_date=Max('grade__date')) \
+                .order_by('-points', '-last_grade_date').distinct()
         else:
-            users = User.objects.filter(role='student').order_by('-points')
+            users = User.objects.filter(role='student') \
+                .annotate(last_grade_date=Max('grade__date')) \
+                .order_by('-points', '-last_grade_date')
+
         users_serializer = UserListSerializer(users, many=True)
         return Response(users_serializer.data)
