@@ -36,7 +36,6 @@ User = get_user_model()
     )
 )
 class RatingViewSet(viewsets.GenericViewSet):
-    permission_classes = [permissions.IsAuthenticated]
 
     @action(detail=False, methods=['get'], url_path='groups', url_name='groups_rating')
     def groups(self, request):

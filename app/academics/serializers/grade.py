@@ -14,7 +14,7 @@ class UserShortSerializer(serializers.ModelSerializer):
 class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
-        fields = '__all__'
+        fields = ('id', 'date', 'grade')
 
 
 class GradeShortSerializer(serializers.ModelSerializer):

@@ -38,20 +38,9 @@ User = get_user_model()
             )
         ]
     ),
-    create=extend_schema(
-        summary='Создание оценки для студента'
-    ),
-    update=extend_schema(
-        summary='Изменение оценки для студента'
-    ),
-    partial_update=extend_schema(
-        summary='Частичное изменение оценки для студента'
-    ),
 )
 class GradeMentorViewSet(viewsets.GenericViewSet,
-                         mixins.ListModelMixin,
-                         mixins.CreateModelMixin,
-                         mixins.UpdateModelMixin):
+                         mixins.ListModelMixin):
     serializer_class = GradeSerializer
     permission_classes = [IsMentorOrReadOnly]
 
@@ -63,9 +52,6 @@ class GradeMentorViewSet(viewsets.GenericViewSet,
         return User.objects.all()
 
     def get_serializer_class(self):
-        # Используем разный сериализатор в зависимости от действия
-        if self.action in ('create', 'update', 'partial_update'):
-            return GradeSerializer
         return StudentGradeSerializer
 
     def list(self, request, *args, **kwargs):
@@ -92,6 +78,35 @@ class GradeMentorViewSet(viewsets.GenericViewSet,
         # Сериализуем данные и возвращаем ответ
         serializer = self.get_serializer(user_grades_data, many=True)
         return Response(serializer.data)
+
+@extend_schema(
+    tags=['Grade Mentor'],
+)
+@extend_schema_view(
+    create=extend_schema(
+        summary='Создание оценки для студента'
+    ),
+    update=extend_schema(
+        summary='Изменение оценки для студента'
+    ),
+    partial_update=extend_schema(
+        summary='Частичное изменение оценки для студента'
+    ),
+)
+class GradeMentor2ViewSet(viewsets.GenericViewSet,
+                         mixins.CreateModelMixin,
+                         mixins.UpdateModelMixin):
+    serializer_class = GradeSerializer
+    permission_classes = [IsMentorOrReadOnly]
+
+    def get_queryset(self):
+        return Grade.objects.all()
+
+    def get_serializer_class(self):
+        # Используем разный сериализатор в зависимости от действия
+        if self.action in ('create', 'update', 'partial_update'):
+            return GradeSerializer
+
 
 @extend_schema(
     tags=['Grade student me'],

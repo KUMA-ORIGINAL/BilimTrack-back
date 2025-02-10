@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import viewsets, mixins, permissions, generics
+from rest_framework import permissions, generics
 from rest_framework.generics import get_object_or_404
 
 from ..serializers import MeSerializer, MeUpdateSerializer
