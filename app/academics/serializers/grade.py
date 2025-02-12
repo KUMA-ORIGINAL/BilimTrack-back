@@ -17,6 +17,12 @@ class GradeSerializer(serializers.ModelSerializer):
         fields = ('id', 'date', 'grade')
 
 
+class GradeCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        fields = ('id', 'date', 'grade', 'user', 'subject')
+
+
 class GradeShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade

@@ -9,8 +9,7 @@ from rest_framework.response import Response
 
 from ..models import Grade
 from ..permissions import IsMentorOrReadOnly
-from ..serializers import GradeSerializer, StudentGradeSerializer
-
+from ..serializers import GradeSerializer, StudentGradeSerializer, GradeCreateSerializer
 
 User = get_user_model()
 
@@ -41,7 +40,7 @@ User = get_user_model()
 )
 class GradeMentorViewSet(viewsets.GenericViewSet,
                          mixins.ListModelMixin):
-    serializer_class = GradeSerializer
+    serializer_class = StudentGradeSerializer
     permission_classes = [IsMentorOrReadOnly]
 
     def get_queryset(self):
@@ -51,8 +50,6 @@ class GradeMentorViewSet(viewsets.GenericViewSet,
             return User.objects.filter(group_id=group_id)
         return User.objects.all()
 
-    def get_serializer_class(self):
-        return StudentGradeSerializer
 
     def list(self, request, *args, **kwargs):
         # Получаем пользователей
@@ -96,16 +93,15 @@ class GradeMentorViewSet(viewsets.GenericViewSet,
 class GradeMentor2ViewSet(viewsets.GenericViewSet,
                          mixins.CreateModelMixin,
                          mixins.UpdateModelMixin):
-    serializer_class = GradeSerializer
     permission_classes = [IsMentorOrReadOnly]
 
     def get_queryset(self):
         return Grade.objects.all()
 
     def get_serializer_class(self):
-        # Используем разный сериализатор в зависимости от действия
-        if self.action in ('create', 'update', 'partial_update'):
-            return GradeSerializer
+        if self.action == 'create':
+            return GradeCreateSerializer
+        return GradeSerializer
 
 
 @extend_schema(
