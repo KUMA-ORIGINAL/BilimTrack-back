@@ -24,7 +24,7 @@ def update_user_and_group_points(grade_instance):
     user.save()
 
     # Обновляем рейтинг пользователя
-    update_user_rating()
+    update_users_rating()
 
     group = user.group
     if group:
