@@ -21,6 +21,19 @@ def update_user_and_group_points(grade_instance):
     user.points = user_points
     user.save()
 
+    # Обновляем рейтинг пользователя
+    update_user_rating(user)
+
     group = user.group
     if group:
         group.update_group_points()
+
+def update_user_rating(user):
+    all_users = user.__class__.objects.order_by('-points')
+
+    # Присваиваем рейтинг пользователю, основываясь на его позиции в списке
+    for rank, u in enumerate(all_users, 1):
+        if u == user:
+            user.rating = rank
+            user.save()
+            break
