@@ -19,3 +19,17 @@ class Achievement(models.Model):
 
     def __str__(self):
         return self.name
+
+class UserAchievement(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='user_achievements', verbose_name="Пользователь")
+    achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE, related_name='user_achievements', verbose_name="Достижение")
+    is_opened = models.BooleanField(default=False, verbose_name="Открыто")
+    opened_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата открытия")
+
+    class Meta:
+        verbose_name = "Пользовательское достижение"
+        verbose_name_plural = "Пользовательские достижения"
+        unique_together = ('user', 'achievement')
+
+    def __str__(self):
+        return f"{self.user} - {self.achievement} (Открыто: {self.is_opened})"

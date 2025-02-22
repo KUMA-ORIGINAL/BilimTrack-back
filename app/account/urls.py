@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import RarityViewSet, AchievementViewSet, UserViewSet, MeViewSet
+from .views import RarityViewSet, AchievementViewSet, UserViewSet, MeViewSet, AchievementMeViewSet
 
 router = DefaultRouter()
 router.register(r'rarities', RarityViewSet)
 router.register(r'achievements', AchievementViewSet)
+router.register(r'achievements/me', AchievementMeViewSet, basename='achievement-me')
 
 urlpatterns = [
     path('', include(router.urls)),
