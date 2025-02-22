@@ -13,6 +13,8 @@ from datetime import timedelta
 from pathlib import Path
 
 import environ
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -215,3 +217,127 @@ DJOSER = {
     # },
 }
 
+UNFOLD = {
+    "SITE_TITLE": 'BilimTrack',
+    "SITE_HEADER": "BilimTrack",
+    "SITE_URL": "/",
+    "SITE_SYMBOL": "settings",  # symbol from icon set
+    "SHOW_HISTORY": True, # show/hide "History" button, default: True
+    "SHOW_VIEW_ON_SITE": True, # show/hide "View on site" button, default: True
+    "BORDER_RADIUS": "6px",
+    "COLORS": {
+        "base": {
+            "50": "249 250 251",
+            "100": "243 244 246",
+            "200": "229 231 235",
+            "300": "209 213 219",
+            "400": "156 163 175",
+            "500": "107 114 128",
+            "600": "75 85 99",
+            "700": "55 65 81",
+            "800": "31 41 55",
+            "900": "17 24 39",
+            "950": "3 7 18",
+        },
+        "primary": {
+            "50": "250 245 255",
+            "100": "243 232 255",
+            "200": "233 213 255",
+            "300": "216 180 254",
+            "400": "192 132 252",
+            "500": "168 85 247",
+            "600": "147 51 234",
+            "700": "126 34 206",
+            "800": "107 33 168",
+            "900": "88 28 135",
+            "950": "59 7 100",
+        },
+        "font": {
+            "subtle-light": "var(--color-base-500)",  # text-base-500
+            "subtle-dark": "var(--color-base-400)",  # text-base-400
+            "default-light": "var(--color-base-600)",  # text-base-600
+            "default-dark": "var(--color-base-300)",  # text-base-300
+            "important-light": "var(--color-base-900)",  # text-base-900
+            "important-dark": "var(--color-base-100)",  # text-base-100
+        },
+    },
+    "SIDEBAR": {
+        "show_search": False,  # Search in applications and models names
+        "show_all_applications": False,  # Dropdown with all applications and models
+        "navigation": [
+            {
+                "title": _("Главная"),
+                "items": [
+                    {
+                        "title": _("Оценки"),
+                        "icon": "stars",
+                        "link": reverse_lazy("admin:academics_grade_changelist"),
+                    },
+                    {
+                        "title": _("Группы"),
+                        "icon": "groups",
+                        "link": reverse_lazy("admin:academics_group_changelist"),
+                    },
+                    {
+                        "title": _("Предметы"),
+                        "icon": "subject",
+                        "link": reverse_lazy("admin:academics_subject_changelist"),
+                    },
+                ]
+            },
+            {
+                "title": _("Достижения"),
+                "items": [
+                    {
+                        "title": _("Достижения"),
+                        "icon": "trophy",
+                        "link": reverse_lazy("admin:account_achievement_changelist"),
+                    },
+                    {
+                        "title": _("Редкости"),
+                        "icon": "category",
+                        "link": reverse_lazy("admin:account_rarity_changelist"),
+                    },
+                    {
+                        "title": _("Пользовательские достижения"),
+                        "icon": "rewarded_ads",
+                        "link": reverse_lazy("admin:account_userachievement_changelist"),
+                    },
+                ]
+            },
+            {
+                "title": _("Пользователи"),
+                "items": [
+                    {
+                        "title": _("Пользователи"),
+                        "icon": "person",
+                        "link": reverse_lazy("admin:account_user_changelist"),
+                    },
+                    {
+                        "title": _("Технологии"),
+                        "icon": "home_repair_service",
+                        "link": reverse_lazy("admin:account_tool_changelist"),
+                    },
+                    # {
+                    #     "title": _("Группы"),
+                    #     "icon": "group",
+                    #     "link": reverse_lazy("admin:auth_group_changelist"),
+                    #     "permission": "account.utils.permission_callback",
+                    # },
+                ],
+            },
+        ],
+    },
+    # "TABS": [
+    #     {
+    #         "models": ["venues.venue"],
+    #         "items": [
+    #             {
+    #                 "title": "Генерация qr-code",
+    #                 "icon": "grade",
+    #                 "link": reverse_lazy("admin:qr"),
+    #             },
+    #         ],
+    #     },
+    # ],
+}
