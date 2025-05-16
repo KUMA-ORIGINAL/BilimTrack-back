@@ -1,11 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
 from django.contrib.auth.models import Group
+from import_export.admin import ImportExportModelAdmin
 
 from unfold.admin import ModelAdmin as UnfoldModelAdmin, TabularInline
+from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.forms import UserChangeForm, UserCreationForm, AdminPasswordChangeForm
 
 from ..models import User, Skill
+from ..resources import UserResource
 
 admin.site.unregister(Group)
 
@@ -15,13 +18,17 @@ class SkillTabularAdmin(TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(UserAdmin, UnfoldModelAdmin):
+class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
+    import_form_class = ImportForm
+    export_form_class = ExportForm
+    resource_classes = [UserResource]
+
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
 
     fieldsets = (
-        (None, {"fields": ("username", "password")}),
+        (None, {"fields": ("username", "password", 'plain_password')}),
         (
             "Permissions",
             {

@@ -10,4 +10,4 @@ class GroupAdmin(UnfoldModelAdmin):
     list_display = ('id', 'name', 'points')
     list_display_links = ('id', 'name',)
     search_fields = ('name',)
-    filter_horizontal = ('subjects',)
+    autocomplete_fields = ('subjects',)

@@ -7,6 +7,7 @@ from ..serializers import MeSerializer, MeUpdateSerializer
 
 User = get_user_model()
 
+
 @extend_schema(tags=['Users Me'])
 class MeViewSet(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
@@ -19,6 +20,7 @@ class MeViewSet(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
 
 @extend_schema(tags=['Users'], summary='Получение профиля пользователя по username')
 class UserViewSet(generics.RetrieveAPIView):

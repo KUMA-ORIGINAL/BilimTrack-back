@@ -71,6 +71,12 @@ class User(AbstractUser):
         blank=True,
         verbose_name=_("Биография")
     )
+    plain_password = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        verbose_name='Пароль (открытый)'
+    )
 
     tools = models.ManyToManyField(
         'Tool',

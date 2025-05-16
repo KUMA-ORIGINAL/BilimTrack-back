@@ -2,6 +2,7 @@ from django.db import models
 from imagekit.models import ProcessedImageField
 from pilkit.processors import ResizeToFill
 
+
 class Achievement(models.Model):
     name = models.CharField(max_length=255, verbose_name="Название достижения")
     description = models.TextField(verbose_name="Описание достижения")
@@ -19,6 +20,7 @@ class Achievement(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class UserAchievement(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='user_achievements', verbose_name="Пользователь")

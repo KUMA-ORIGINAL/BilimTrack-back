@@ -2,6 +2,7 @@ from django.db import models
 from imagekit.models import ProcessedImageField
 from pilkit.processors import ResizeToFill
 
+
 class Group(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name='Название группы')
     rules = models.JSONField(blank=True, null=True, help_text="Правила для группы", verbose_name='Правила')

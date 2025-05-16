@@ -2,9 +2,11 @@
 **/__pycache__
 
 **/app/media
+**/app/static
 
 .env.dev
 .env.prod
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
