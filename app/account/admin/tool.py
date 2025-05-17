@@ -11,6 +11,7 @@ from account.models import Tool
 @admin.register(Tool)
 class ToolAdmin(UnfoldModelAdmin):
     list_display = ('name', 'display_photo')
+    search_fields = ('name',)
 
     @display(description=_("Фото"))
     def display_photo(self, obj):

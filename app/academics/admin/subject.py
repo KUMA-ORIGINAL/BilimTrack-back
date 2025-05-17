@@ -10,9 +10,10 @@ from ..models import Subject
 
 @admin.register(Subject)
 class SubjectAdmin(UnfoldModelAdmin):
-    list_display = ('id', 'name', 'description', 'display_photo')
+    list_display = ('id', 'name', 'description', 'organization', 'display_photo')
     list_display_links = ('id', 'name')
     search_fields = ('name',)
+    list_filter = ('organization',)
 
     @display(description=_("Фото"))
     def display_photo(self, obj):

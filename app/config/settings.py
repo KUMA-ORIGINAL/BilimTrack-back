@@ -55,6 +55,7 @@ else:
 
 INSTALLED_APPS = [
     'unfold',
+    "unfold.contrib.filters",
     "unfold.contrib.import_export",
 
     'django.contrib.admin',
@@ -322,6 +323,11 @@ UNFOLD = {
             {
                 "title": _("Главная"),
                 "items": [
+                    {
+                        "title": _("Учебные заведения"),
+                        "icon": "domain",
+                        "link": reverse_lazy("admin:academics_organization_changelist"),
+                    },
                     {
                         "title": _("Оценки"),
                         "icon": "stars",

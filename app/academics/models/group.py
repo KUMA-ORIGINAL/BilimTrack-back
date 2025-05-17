@@ -15,6 +15,8 @@ class Group(models.Model):
     points = models.PositiveIntegerField(default=0, blank=True, verbose_name='Очки')
     subjects = models.ManyToManyField('Subject', related_name='groups', verbose_name='Предметы')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, null=True, blank=True,
+                                     verbose_name='Учебное заведение')
 
     def __str__(self):
         return self.name

@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group
 from import_export.admin import ImportExportModelAdmin
 
 from unfold.admin import ModelAdmin as UnfoldModelAdmin, TabularInline
+from unfold.contrib.filters.admin import RelatedDropdownFilter
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.forms import UserChangeForm, UserCreationForm, AdminPasswordChangeForm
 
@@ -37,15 +38,15 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
                     "is_active",
                     "is_superuser",
                     "groups",
-                    "user_permissions",
+                    # "user_permissions",
                 )
             },
         ),
         ("Dates", {"fields": ("last_login", "date_joined")}),
         ("Общее", {"fields": ('email', 'first_name', 'last_name', 'role', 'photo', )}),
         ('Для студента', {
-            'fields': ('achievements', 'group', 'achievements_count',
-                        'points', 'rating')}),
+            'fields': ('group', 'achievements_count',
+                        'points', 'rating', 'achievements')}),
         ('Для ментора', {
             'fields': ('tools',)}),
     )
@@ -69,7 +70,10 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
 
     list_display = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'group', 'points', 'rating')
     list_display_links = ('id', 'username')
-    filter_horizontal = ('achievements', 'tools')
+    list_filter = ('role',  ("group", RelatedDropdownFilter),
+                   'is_active', 'is_staff', 'is_superuser')
+    list_filter_submit = True
+    autocomplete_fields = ('achievements', 'tools')
     inlines = [SkillTabularAdmin]
     list_per_page = 20
 

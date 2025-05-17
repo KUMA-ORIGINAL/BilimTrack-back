@@ -100,6 +100,8 @@ class User(AbstractUser):
         null=True,
         verbose_name=_("Группа")
     )
+    organization = models.ForeignKey('academics.Organization', on_delete=models.SET_NULL, null=True, blank=True,
+                                     verbose_name='Учебное заведение')
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
