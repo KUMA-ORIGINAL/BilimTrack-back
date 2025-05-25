@@ -1,9 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from academics.models import Subject
-
 User = get_user_model()
+
 
 class Grade(models.Model):
     GRADE_CHOICES = [
@@ -21,18 +20,18 @@ class Grade(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Предмет')
+    session = models.ForeignKey('Session', on_delete=models.CASCADE, verbose_name='Занятие', null=True, blank=True)
     grade = models.IntegerField(choices=GRADE_CHOICES, verbose_name='Оценка')
-    date = models.DateField(verbose_name='Дата')
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
 
-    created_at = models.DateField(auto_now_add=True, verbose_name='Дата создания')
-    updated_at = models.DateField(auto_now=True, verbose_name='Дата обновления')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
 
     class Meta:
+        unique_together = ('user', 'session')  # Один студент — одна оценка за пару
         ordering = ('-created_at',)
         verbose_name = 'Оценка'
         verbose_name_plural = 'Оценки'
 
     def __str__(self):
-        return f"{self.user.username} - {self.grade}"
+        return f"{self.user.username} - {self.grade} ({self.session})"

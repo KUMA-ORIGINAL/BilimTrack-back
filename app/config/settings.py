@@ -76,7 +76,8 @@ INSTALLED_APPS = [
     'import_export',
 
     'account',
-    'academics'
+    'academics',
+    'schedule',
 ]
 
 MIDDLEWARE = [
@@ -344,6 +345,36 @@ UNFOLD = {
                         "link": reverse_lazy("admin:academics_subject_changelist"),
                     },
                 ]
+            },
+            {
+                "title": _("Расписание"),
+                "items": [
+                    {
+                        "title": _("Преподаватели"),
+                        "icon": "person",
+                        "link": lambda request: f"{reverse_lazy('admin:account_user_changelist')}?role__exact=mentor",
+                    },
+                    {
+                        "title": _("Аудитории"),
+                        "icon": "location_on",
+                        "link": reverse_lazy("admin:schedule_room_changelist"),
+                    },
+                    {
+                        "title": _("Время пар"),
+                        "icon": "schedule",
+                        "link": reverse_lazy("admin:schedule_lessontime_changelist"),
+                    },
+                    {
+                        "title": _("Типы занятий"),
+                        "icon": "category",
+                        "link": reverse_lazy("admin:schedule_lessontype_changelist"),
+                    },
+                    {
+                        "title": _("Занятия"),
+                        "icon": "event_note",
+                        "link": reverse_lazy("admin:schedule_schedule_changelist"),
+                    },
+                ],
             },
             {
                 "title": _("Достижения"),

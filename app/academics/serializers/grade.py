@@ -5,6 +5,7 @@ from ..models import Grade
 
 User = get_user_model()
 
+
 class UserShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -14,19 +15,19 @@ class UserShortSerializer(serializers.ModelSerializer):
 class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
-        fields = ('id', 'date', 'grade')
+        fields = ('id', 'grade')
 
 
 class GradeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
-        fields = ('id', 'date', 'grade', 'user', 'subject')
+        fields = ('id', 'grade', 'user')
 
 
 class GradeShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
-        fields = ('id', 'date', 'grade')
+        fields = ('id', 'grade')
 
 
 class StudentGradeSerializer(serializers.Serializer):

@@ -8,13 +8,13 @@ from academics.models import Grade
 
 @admin.register(Grade)
 class GradeAdmin(UnfoldModelAdmin):
-    list_display = ('user', 'subject', 'grade', 'comment', 'date')  # отображаемые поля
+    list_display = ('user', 'session', 'grade', 'comment',)  # отображаемые поля
     ordering = ('-created_at',)  # сортировка по дате создания
     readonly_fields = ('created_at', 'updated_at')
 
     list_filter = (
         ("user", RelatedDropdownFilter),
-        ("subject", RelatedDropdownFilter),
+        ("session", RelatedDropdownFilter),
         'grade',
         'created_at',
     )
@@ -22,7 +22,7 @@ class GradeAdmin(UnfoldModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'subject', 'grade', 'date', 'comment')
+            'fields': ('user', 'session', 'grade', 'date', 'comment')
         }),
         ('Таймстемпы', {
             'fields': ('created_at', 'updated_at'),

@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('api/', include('academics.urls')),
     path('api/', include('account.urls')),
+    path('api/', include('schedule.urls')),
 ]
 
 if settings.DEBUG:
