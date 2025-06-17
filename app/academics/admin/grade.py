@@ -22,7 +22,7 @@ class GradeAdmin(UnfoldModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'session', 'grade', 'date', 'comment')
+            'fields': ('user', 'session', 'grade', 'comment')
         }),
         ('Таймстемпы', {
             'fields': ('created_at', 'updated_at'),

@@ -344,6 +344,11 @@ UNFOLD = {
                         "icon": "subject",
                         "link": reverse_lazy("admin:academics_subject_changelist"),
                     },
+                    {
+                        "title": _("Занятия"),
+                        "icon": "event",
+                        "link": reverse_lazy("admin:academics_session_changelist"),
+                    },
                 ]
             },
             {

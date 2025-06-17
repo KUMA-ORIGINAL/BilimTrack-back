@@ -1,13 +1,10 @@
-from collections import defaultdict
-
 from django.contrib.auth import get_user_model
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import viewsets, permissions, mixins, generics
 from rest_framework.response import Response
 
-from ..models import Grade
+from ..models import Grade, Session
 from ..permissions import IsMentorOrReadOnly
 from ..serializers import GradeSerializer, StudentGradeSerializer, GradeCreateSerializer
 
@@ -43,38 +40,26 @@ class GradeMentorViewSet(viewsets.GenericViewSet,
     serializer_class = StudentGradeSerializer
     permission_classes = [IsMentorOrReadOnly]
 
-    def get_queryset(self):
-        # Получаем пользователей, отфильтрованных по groupId
-        group_id = self.request.query_params.get('group_id')
-        if group_id:
-            return User.objects.filter(group_id=group_id)
-        return User.objects.all()
-
-
     def list(self, request, *args, **kwargs):
-        # Получаем пользователей
-        users = self.get_queryset()
-
-        # Получаем subjectId из параметров запроса
+        group_id = request.query_params.get('group_id')
         subject_id = request.query_params.get('subject_id')
-        if not subject_id:
-            return Response({"error": "subjectId is required"}, status=400)
+        if not group_id or not subject_id:
+            return Response({"error": "group_id and subject_id are required"}, status=400)
 
-        # Преобразуем subjectId в целое число
-        subject_id = int(subject_id)
+        users = User.objects.filter(group_id=group_id)
+        sessions = Session.objects.filter(subject_id=subject_id).values_list('id', flat=True)
 
-        # Собираем оценки для каждого пользователя
         user_grades_data = []
         for user in users:
-            grades = Grade.objects.filter(user=user, subject_id=subject_id)
+            grades = Grade.objects.filter(user=user, session_id__in=sessions)
             user_grades_data.append({
                 'user': user,
                 'scores': grades
             })
 
-        # Сериализуем данные и возвращаем ответ
         serializer = self.get_serializer(user_grades_data, many=True)
         return Response(serializer.data)
+
 
 @extend_schema(
     tags=['Grade Mentor'],
