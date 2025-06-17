@@ -143,17 +143,13 @@ class MarkAttendanceAPIView(APIView):
         user = request.user
 
         session = get_object_or_404(Session, id=session_id)
-        grade = Grade.objects.filter(user=user, session=session, grade=5).first()
-        already_marked = False
+        grade, created = Grade.objects.get_or_create(
+            user=user,
+            session=session,
+            defaults={'grade': 5}
+        )
 
-        if grade:
-            already_marked = True
-        else:
-            grade = Grade.objects.create(
-                user=user,
-                session=session,
-                grade=5
-            )
+        already_marked = not created
 
         response_serializer = AttendanceMarkSerializer(grade)
         return Response({
