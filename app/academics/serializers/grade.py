@@ -45,3 +45,17 @@ class SessionShortSerializer(serializers.ModelSerializer):
 class StudentGradeSerializer(serializers.Serializer):
     user = UserShortSerializer(read_only=True)
     scores = GradeShortSerializer(many=True)
+
+
+class AttendanceMarkSerializer(serializers.ModelSerializer):
+    session_id = serializers.UUIDField(source='session.id', read_only=True)
+    date = serializers.DateField(source='session.date', format='%d-%m-%Y', read_only=True)
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = Grade
+        fields = ('id', 'session_id', 'user_id', 'grade', 'date')
+
+
+class AttendanceMarkRequestSerializer(serializers.Serializer):
+    session_id = serializers.UUIDField()

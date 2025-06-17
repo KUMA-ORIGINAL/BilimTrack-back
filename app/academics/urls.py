@@ -5,7 +5,7 @@ from .views import (GroupViewSet,
                     StudentGradeAPIView,
                     RatingViewSet,
                     PerformanceChartView,
-                    MentorGradeViewSet)
+                    MentorGradeViewSet, MarkAttendanceAPIView)
 
 router = DefaultRouter()
 router.register(r'groups', GroupViewSet)
@@ -17,4 +17,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('student-grades/me/',StudentGradeAPIView.as_view()),
     path('performance-chart/me/', PerformanceChartView.as_view()),
+    path('attendance/mark/', MarkAttendanceAPIView.as_view(), name='mark-attendance'),
 ]

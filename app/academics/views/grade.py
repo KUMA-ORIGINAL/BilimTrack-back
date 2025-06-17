@@ -1,14 +1,15 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
-from rest_framework import viewsets, permissions, mixins, generics
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiResponse
+from rest_framework import viewsets, permissions, mixins, generics, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ..models import Grade, Session
 from ..permissions import IsMentorOrReadOnly
 from ..serializers import GradeSerializer, StudentGradeSerializer, GradeCreateSerializer, SessionShortSerializer, \
-    UserShortSerializer, GradeShortSerializer
-
+    UserShortSerializer, GradeShortSerializer, AttendanceMarkRequestSerializer, AttendanceMarkSerializer
 
 User = get_user_model()
 
@@ -117,3 +118,46 @@ class StudentGradeAPIView(generics.RetrieveAPIView):
         }
         serializer = self.get_serializer(data)
         return Response(serializer.data)
+
+
+class MarkAttendanceAPIView(APIView):
+    """
+    POST {"session_id": "..."}
+    Отмечает присутствие (grade=5) текущего пользователя на занятии.
+    Если отметка уже стоит — ничего не меняет.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        request=AttendanceMarkRequestSerializer,
+        responses={
+            200: OpenApiResponse(response=AttendanceMarkSerializer, description="Уже отмечено"),
+            201: OpenApiResponse(response=AttendanceMarkSerializer, description="Отметка создана"),
+            400: OpenApiResponse(description="Нет session_id"),
+        }
+    )
+    def post(self, request):
+        serializer = AttendanceMarkRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        session_id = serializer.validated_data['session_id']
+        user = request.user
+
+        session = get_object_or_404(Session, id=session_id)
+        grade = Grade.objects.filter(user=user, session=session, grade=5).first()
+        already_marked = False
+
+        if grade:
+            already_marked = True
+        else:
+            grade = Grade.objects.create(
+                user=user,
+                session=session,
+                grade=5
+            )
+
+        response_serializer = AttendanceMarkSerializer(grade)
+        return Response({
+            'marked': True,
+            'already_marked': already_marked,
+            **response_serializer.data
+        }, status=status.HTTP_200_OK if already_marked else status.HTTP_201_CREATED)
