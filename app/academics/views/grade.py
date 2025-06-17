@@ -12,6 +12,61 @@ from ..serializers import GradeSerializer, StudentGradeSerializer, GradeCreateSe
 User = get_user_model()
 
 
+# @extend_schema(
+#     tags=['Grade Mentor'],
+# )
+# @extend_schema_view(
+#     list=extend_schema(
+#         summary='Получить оценки студентов по subject id',
+#         parameters = [
+#             OpenApiParameter(
+#                 name='subject_id',
+#                 description='ID of the subject for filtering grades',
+#                 required=False,
+#                 type=OpenApiTypes.INT,  # Тип параметра - целое число
+#                 location=OpenApiParameter.QUERY  # Указание того, что параметр находится в строке запроса
+#             ),
+#             OpenApiParameter(
+#                 name='group_id',
+#                 description='ID of the group for filtering grades',
+#                 required=False,
+#                 type=OpenApiTypes.INT,  # Тип параметра - целое число
+#                 location=OpenApiParameter.QUERY  # Указание того, что параметр находится в строке запроса
+#             )
+#         ]
+#     ),
+# )
+# class GradeMentorViewSet(viewsets.GenericViewSet,
+#                          mixins.ListModelMixin):
+#     serializer_class = StudentGradeSerializer
+#     permission_classes = [IsMentorOrReadOnly]
+#
+#     def list(self, request, *args, **kwargs):
+#         group_id = request.query_params.get('group_id')
+#         subject_id = request.query_params.get('subject_id')
+#         if not group_id or not subject_id:
+#             return Response({"error": "group_id and subject_id are required"}, status=400)
+#
+#         sessions = Session.objects.filter(subject_id=subject_id).order_by('date')
+#         sessions_data = SessionShortSerializer(sessions, many=True).data
+#
+#         users = User.objects.filter(group_id=group_id)
+#
+#         grades_list = []
+#         for user in users:
+#             grades = Grade.objects.filter(user=user, session__in=sessions)
+#             user_data = {
+#                 "user": UserShortSerializer(user).data,
+#                 "scores": GradeShortSerializer(grades, many=True).data
+#             }
+#             grades_list.append(user_data)
+#
+#         return Response({
+#             "sessions": sessions_data,
+#             "grades": grades_list
+#         })
+
+
 @extend_schema(
     tags=['Grade Mentor'],
 )
@@ -35,11 +90,31 @@ User = get_user_model()
             )
         ]
     ),
+    create=extend_schema(
+        summary='Создание оценки для студента'
+    ),
+    update=extend_schema(
+        summary='Изменение оценки для студента'
+    ),
+    partial_update=extend_schema(
+        summary='Частичное изменение оценки для студента'
+    ),
 )
-class GradeMentorViewSet(viewsets.GenericViewSet,
+class MentorGradeViewSet(viewsets.GenericViewSet,
+                         mixins.CreateModelMixin,
+                         mixins.UpdateModelMixin,
                          mixins.ListModelMixin):
-    serializer_class = StudentGradeSerializer
     permission_classes = [IsMentorOrReadOnly]
+
+    def get_queryset(self):
+        return Grade.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return GradeCreateSerializer
+        elif self.action == 'list':
+            return StudentGradeSerializer
+        return GradeSerializer
 
     def list(self, request, *args, **kwargs):
         group_id = request.query_params.get('group_id')
@@ -65,34 +140,6 @@ class GradeMentorViewSet(viewsets.GenericViewSet,
             "sessions": sessions_data,
             "grades": grades_list
         })
-
-
-@extend_schema(
-    tags=['Grade Mentor'],
-)
-@extend_schema_view(
-    create=extend_schema(
-        summary='Создание оценки для студента'
-    ),
-    update=extend_schema(
-        summary='Изменение оценки для студента'
-    ),
-    partial_update=extend_schema(
-        summary='Частичное изменение оценки для студента'
-    ),
-)
-class GradeMentor2ViewSet(viewsets.GenericViewSet,
-                         mixins.CreateModelMixin,
-                         mixins.UpdateModelMixin):
-    permission_classes = [IsMentorOrReadOnly]
-
-    def get_queryset(self):
-        return Grade.objects.all()
-
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return GradeCreateSerializer
-        return GradeSerializer
 
 
 @extend_schema(
