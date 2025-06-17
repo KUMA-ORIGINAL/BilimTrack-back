@@ -6,7 +6,8 @@ from rest_framework.response import Response
 
 from ..models import Grade, Session
 from ..permissions import IsMentorOrReadOnly
-from ..serializers import GradeSerializer, StudentGradeSerializer, GradeCreateSerializer
+from ..serializers import GradeSerializer, StudentGradeSerializer, GradeCreateSerializer, SessionShortSerializer, \
+    UserShortSerializer, GradeShortSerializer
 
 User = get_user_model()
 
@@ -46,19 +47,24 @@ class GradeMentorViewSet(viewsets.GenericViewSet,
         if not group_id or not subject_id:
             return Response({"error": "group_id and subject_id are required"}, status=400)
 
+        sessions = Session.objects.filter(subject_id=subject_id).order_by('date')
+        sessions_data = SessionShortSerializer(sessions, many=True).data
+
         users = User.objects.filter(group_id=group_id)
-        sessions = Session.objects.filter(subject_id=subject_id).values_list('id', flat=True)
 
-        user_grades_data = []
+        grades_list = []
         for user in users:
-            grades = Grade.objects.filter(user=user, session_id__in=sessions)
-            user_grades_data.append({
-                'user': user,
-                'scores': grades
-            })
+            grades = Grade.objects.filter(user=user, session__in=sessions)
+            user_data = {
+                "user": UserShortSerializer(user).data,
+                "scores": GradeShortSerializer(grades, many=True).data
+            }
+            grades_list.append(user_data)
 
-        serializer = self.get_serializer(user_grades_data, many=True)
-        return Response(serializer.data)
+        return Response({
+            "sessions": sessions_data,
+            "grades": grades_list
+        })
 
 
 @extend_schema(

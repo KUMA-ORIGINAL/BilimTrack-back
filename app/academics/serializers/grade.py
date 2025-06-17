@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from ..models import Grade
+from ..models import Grade, Session
 
 User = get_user_model()
 
@@ -31,6 +31,15 @@ class GradeShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
         fields = ('id', 'grade', 'date', 'session_id')
+
+
+class SessionShortSerializer(serializers.ModelSerializer):
+    sessionId = serializers.UUIDField(source='id')
+    date = serializers.DateField()
+
+    class Meta:
+        model = Session
+        fields = ('sessionId', 'date')
 
 
 class StudentGradeSerializer(serializers.Serializer):
