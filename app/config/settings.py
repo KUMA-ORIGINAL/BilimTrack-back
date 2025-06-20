@@ -414,6 +414,11 @@ UNFOLD = {
                         "icon": "home_repair_service",
                         "link": reverse_lazy("admin:account_tool_changelist"),
                     },
+                    {
+                        "title": _("Навыки"),
+                        "icon": "psychology",
+                        "link": reverse_lazy("admin:account_skill_changelist"),
+                    },
                     # {
                     #     "title": _("Группы"),
                     #     "icon": "group",

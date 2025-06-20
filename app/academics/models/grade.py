@@ -19,7 +19,7 @@ class Grade(models.Model):
         (10, 'Оценка 10'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Студент')
     session = models.ForeignKey('Session', on_delete=models.CASCADE, verbose_name='Занятие', null=True, blank=True)
     grade = models.IntegerField(choices=GRADE_CHOICES, verbose_name='Оценка')
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')

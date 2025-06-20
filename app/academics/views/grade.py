@@ -8,8 +8,9 @@ from rest_framework.views import APIView
 
 from ..models import Grade, Session
 from ..permissions import IsMentorOrReadOnly
-from ..serializers import GradeSerializer, StudentGradeSerializer, GradeCreateSerializer, SessionShortSerializer, \
-    UserShortSerializer, GradeShortSerializer, AttendanceMarkRequestSerializer, AttendanceMarkSerializer
+from ..serializers import GradeUpdateSerializer, GradeCreateSerializer, SessionShortSerializer, \
+    UserShortSerializer, GradeShortSerializer, AttendanceMarkRequestSerializer, AttendanceMarkSerializer, \
+    SessionAndGradeSerializer
 
 User = get_user_model()
 
@@ -20,6 +21,7 @@ User = get_user_model()
 @extend_schema_view(
     list=extend_schema(
         summary='Получить оценки студентов по subject id',
+        responses={200: SessionAndGradeSerializer(read_only=True)},
         parameters = [
             OpenApiParameter(
                 name='subject_id',
@@ -60,8 +62,8 @@ class MentorGradeViewSet(viewsets.GenericViewSet,
         if self.action == 'create':
             return GradeCreateSerializer
         elif self.action == 'list':
-            return StudentGradeSerializer
-        return GradeSerializer
+            return SessionAndGradeSerializer
+        return GradeUpdateSerializer
 
     def list(self, request, *args, **kwargs):
         group_id = request.query_params.get('group_id')
@@ -102,7 +104,7 @@ class MentorGradeViewSet(viewsets.GenericViewSet,
     ]
 )
 class StudentGradeAPIView(generics.RetrieveAPIView):
-    serializer_class = StudentGradeSerializer
+    serializer_class = SessionAndGradeSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):

@@ -37,6 +37,7 @@ class User(AbstractUser):
     email = models.EmailField(_("Адрес электронной почты"), blank=True)
     first_name = models.CharField(max_length=100, verbose_name=_("Имя"), blank=True)
     last_name = models.CharField(max_length=100, verbose_name=_("Фамилия"), blank=True)
+    phone_number = models.CharField("Номер телефона", max_length=20)
     photo = ProcessedImageField(
         upload_to='user_photos/%Y/%m',
         processors=[ResizeToFill(500, 500)],
@@ -67,10 +68,7 @@ class User(AbstractUser):
         verbose_name=_("Рейтинг")
     )
 
-    biography = models.TextField(
-        blank=True,
-        verbose_name=_("Биография")
-    )
+
     plain_password = models.CharField(
         max_length=20,
         blank=True,
@@ -78,6 +76,20 @@ class User(AbstractUser):
         verbose_name='Пароль (открытый)'
     )
 
+    mentor_achievements = models.TextField(verbose_name='Достижения ментора', blank=True, null=True)
+    education = models.TextField(verbose_name='Образование', blank=True, null=True)
+
+    instagram = models.URLField("Instagram", max_length=255, blank=True, null=True)
+    telegram = models.URLField("Telegram", max_length=255, blank=True, null=True)
+    whatsapp = models.URLField("Whatsapp", max_length=255, blank=True, null=True)
+    facebook = models.URLField("Facebook", max_length=255, blank=True, null=True)
+
+    skills = models.ManyToManyField(
+        'Skill',
+        related_name='users',
+        verbose_name='Навыки',
+        blank=True
+    )
     tools = models.ManyToManyField(
         'Tool',
         related_name='users',

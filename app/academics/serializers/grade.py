@@ -12,16 +12,17 @@ class UserShortSerializer(serializers.ModelSerializer):
         fields = ('id', 'full_name', 'username')
 
 
-class GradeSerializer(serializers.ModelSerializer):
+class GradeUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
         fields = ('id', 'grade')
 
 
 class GradeCreateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Grade
-        fields = ('id', 'grade', 'user')
+        fields = ('id', 'session', 'grade', 'user')
 
 
 class GradeShortSerializer(serializers.ModelSerializer):
@@ -39,12 +40,17 @@ class SessionShortSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Session
-        fields = ('sessionId', 'date')
+        fields = ('id', 'sessionId', 'date')
 
 
-class StudentGradeSerializer(serializers.Serializer):
+class GradeListSerializer(serializers.Serializer):
     user = UserShortSerializer(read_only=True)
     scores = GradeShortSerializer(many=True)
+
+
+class SessionAndGradeSerializer(serializers.Serializer):
+    sessions = SessionShortSerializer(many=True)
+    grades = GradeListSerializer(many=True)
 
 
 class AttendanceMarkSerializer(serializers.ModelSerializer):
