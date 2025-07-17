@@ -17,11 +17,11 @@ WEEK_TYPES = [
     ('bottom', 'Знаменатель'),  # Нижняя неделя
 ]
 
+
 class Schedule(models.Model):
-    group = models.ForeignKey(
+    groups = models.ManyToManyField(
         'academics.Group',
-        on_delete=models.CASCADE,
-        verbose_name='Группа'
+        verbose_name='Группы'
     )
     subject = models.ForeignKey(
         'academics.Subject',
@@ -56,7 +56,7 @@ class Schedule(models.Model):
         null=True
     )
     week_type = models.CharField(
-        max_length=6,
+        max_length=7,
         choices=WEEK_TYPES,
         default='weekly',
         blank=True,
@@ -66,7 +66,8 @@ class Schedule(models.Model):
     class Meta:
         verbose_name = 'Занятие'
         verbose_name_plural = 'Расписание'
-        unique_together = ('group', 'day_of_week', 'lesson_time')
+        # unique_together тут уже не подходит, т.к. groups - M2M
 
     def __str__(self):
-        return f"{self.group} - {self.subject} ({self.get_day_of_week_display()}, {self.lesson_time})"
+        group_names = ', '.join([str(g) for g in self.groups.all()])
+        return f"{group_names} - {self.subject} ({self.get_day_of_week_display()}, {self.lesson_time})"

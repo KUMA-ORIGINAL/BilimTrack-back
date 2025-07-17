@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from ..models import Schedule
-
 from .group import GroupSerializer
 from .subject import SubjectSerializer
 from .room import RoomSerializer
@@ -11,7 +10,7 @@ from .lesson_type import LessonTypeSerializer
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
-    group = GroupSerializer(read_only=True)
+    groups = GroupSerializer(many=True, read_only=True)
     subject = SubjectSerializer(read_only=True)
     teacher = TeacherSerializer(read_only=True)
     room = RoomSerializer(read_only=True)
@@ -22,7 +21,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
         model = Schedule
         fields = [
             'id',
-            'group',
+            'groups',
             'subject',
             'teacher',
             'room',
@@ -34,11 +33,16 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 
 class ScheduleCreateUpdateSerializer(serializers.ModelSerializer):
+    groups = serializers.PrimaryKeyRelatedField(
+        queryset=GroupSerializer.Meta.model.objects.all(),
+        many=True
+    )
+
     class Meta:
         model = Schedule
         fields = [
             'id',
-            'group',
+            'groups',
             'subject',
             'teacher',
             'room',
