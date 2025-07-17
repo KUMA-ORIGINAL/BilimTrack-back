@@ -10,7 +10,8 @@ from schedule.serializers import ScheduleCreateUpdateSerializer, ScheduleSeriali
 class ScheduleViewSet(viewsets.GenericViewSet,
                       mixins.ListModelMixin,
                       mixins.CreateModelMixin,
-                      mixins.UpdateModelMixin):
+                      mixins.UpdateModelMixin,
+                      mixins.DestroyModelMixin):
     queryset = Schedule.objects.select_related(
         'subject', 'teacher', 'room', 'lesson_time'
     ).prefetch_related('groups').all()
