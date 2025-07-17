@@ -12,8 +12,8 @@ class ScheduleViewSet(viewsets.GenericViewSet,
                       mixins.CreateModelMixin,
                       mixins.UpdateModelMixin):
     queryset = Schedule.objects.select_related(
-        'groups', 'subject', 'teacher', 'room', 'lesson_time'
-    ).all()
+        'subject', 'teacher', 'room', 'lesson_time'
+    ).prefetch_related('groups').all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = [
         'groups', 'teacher', 'subject', 'room',
