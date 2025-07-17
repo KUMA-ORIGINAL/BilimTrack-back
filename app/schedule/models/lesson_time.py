@@ -12,8 +12,7 @@ class LessonTime(models.Model):
     class Meta:
         verbose_name = 'Время пары'
         verbose_name_plural = 'Время пар'
+        ordering = ['start_time']
 
     def __str__(self):
         return f"{self.start_time} - {self.end_time}"
-
-
