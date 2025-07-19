@@ -3,6 +3,7 @@ from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from ..models import Schedule
 
+
 @admin.register(Schedule)
 class ScheduleAdmin(UnfoldModelAdmin):
     list_display = (
