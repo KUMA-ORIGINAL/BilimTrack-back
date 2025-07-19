@@ -77,7 +77,6 @@ class User(AbstractUser):
     )
 
     mentor_achievements = models.TextField(verbose_name='Достижения ментора', blank=True, null=True)
-    education = models.TextField(verbose_name='Образование', blank=True, null=True)
 
     instagram = models.URLField("Instagram", max_length=255, blank=True, null=True)
     telegram = models.URLField("Telegram", max_length=255, blank=True, null=True)

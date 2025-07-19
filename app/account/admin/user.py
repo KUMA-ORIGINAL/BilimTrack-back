@@ -8,7 +8,7 @@ from unfold.contrib.filters.admin import RelatedDropdownFilter
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.forms import UserChangeForm, UserCreationForm, AdminPasswordChangeForm
 
-from ..models import User, WorkExperience
+from ..models import User, WorkExperience, Education
 from ..resources import UserResource
 
 admin.site.unregister(Group)
@@ -16,6 +16,11 @@ admin.site.unregister(Group)
 
 class WorkExperienceInline(StackedInline):  # или admin.StackedInline
     model = WorkExperience
+    extra = 1  # сколько пустых форм для добавления
+
+
+class EducationInline(StackedInline):  # или admin.StackedInline
+    model = Education
     extra = 1  # сколько пустых форм для добавления
 
 
@@ -39,7 +44,7 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
                    'is_active', 'is_staff', 'is_superuser')
     list_filter_submit = True
     autocomplete_fields = ('achievements', 'tools', 'skills')
-    inlines = [WorkExperienceInline]
+    inlines = [WorkExperienceInline, EducationInline]
     list_per_page = 20
 
     fieldsets = (
@@ -67,7 +72,6 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
                 'skills',  # Навыки
                 'tools',  # Инструменты
                 'mentor_achievements',  # Достижения ментора
-                'education',  # Образование
                 'instagram',  # Instagram
                 'telegram',  # Telegram
                 'whatsapp',  # Whatsapp

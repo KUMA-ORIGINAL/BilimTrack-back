@@ -5,11 +5,12 @@ from rest_framework import serializers
 
 from academics.models import Grade
 from academics.serializers import PerformanceChartSerializer
+from .education import EducationSerializer
 from .skill import SkillSerializer
 from .tool import ToolSerializer
 from .achievement import AchievementSerializer
 from .work_experience import WorkExperienceSerializer
-from ..models import Skill, WorkExperience
+from ..models import Skill, WorkExperience, Education
 
 User = get_user_model()
 
@@ -22,6 +23,7 @@ class MeSerializer(serializers.ModelSerializer):
     skills = SkillSerializer(many=True)
     tools = ToolSerializer(many=True)
     work_experiences = WorkExperienceSerializer(many=True, read_only=True)
+    educations = EducationSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -46,11 +48,11 @@ class MeSerializer(serializers.ModelSerializer):
                 'photo',
                 'skills',
                 'mentor_achievements',
-                'education',
                 'instagram',
                 'telegram',
                 'whatsapp',
                 'facebook',
+                'educations',
                 'work_experiences',  # если нужно отобразить связь с опытом работы (например, через related_name)
             )
         else:
@@ -80,6 +82,7 @@ class MeUpdateSerializer(serializers.ModelSerializer):
     #     queryset=Skill.objects.all(), many=True, required=False
     # )
     work_experiences = WorkExperienceSerializer(many=True, required=False)
+    educations = EducationSerializer(many=True, required=False)
 
     class Meta:
         model = User
@@ -93,13 +96,12 @@ class MeUpdateSerializer(serializers.ModelSerializer):
             'photo',
             'skills',
             'mentor_achievements',
-            'education',
             'instagram',
             'telegram',
             'whatsapp',
             'facebook',
+            'educations',
             'work_experiences',
-
         )
 
     def update(self, instance, validated_data):
@@ -111,11 +113,16 @@ class MeUpdateSerializer(serializers.ModelSerializer):
         # Обрабатываем work_experiences как вложенную связь
         work_experiences_data = validated_data.pop('work_experiences', None)
         if work_experiences_data is not None:
-            # Удаляем старые
             instance.work_experiences.all().delete()
-            # Создаем новые
             for work_data in work_experiences_data:
                 WorkExperience.objects.create(user=instance, **work_data)
+
+        # Обрабатываем educations как вложенную связь
+        educations_data = validated_data.pop('educations', None)
+        if educations_data is not None:
+            instance.educations.all().delete()
+            for education_data in educations_data:
+                Education.objects.create(user=instance, **education_data)
 
         # Обновляем остальные поля
         for attr, value in validated_data.items():
