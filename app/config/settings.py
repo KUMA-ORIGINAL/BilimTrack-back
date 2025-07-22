@@ -335,6 +335,11 @@ UNFOLD = {
                         "link": reverse_lazy("admin:academics_grade_changelist"),
                     },
                     {
+                        "title": _("Курсы"),
+                        "icon": "school",
+                        "link": reverse_lazy("admin:academics_course_changelist"),
+                    },
+                    {
                         "title": _("Группы"),
                         "icon": "groups",
                         "link": reverse_lazy("admin:academics_group_changelist"),

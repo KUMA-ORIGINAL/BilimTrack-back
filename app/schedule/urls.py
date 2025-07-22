@@ -10,6 +10,7 @@ router.register(r'lesson-times', views.LessonTimeViewSet, basename='lessontime')
 router.register(r'teachers', views.TeacherViewSet, basename='teacher')
 router.register(r'subjects', views.SubjectViewSet, basename='subject')
 router.register(r'groups', views.GroupViewSet, basename='group')
+router.register(r'courses', views.CourseViewSet, basename='course')
 router.register('', views.ScheduleViewSet)
 
 urlpatterns = [

@@ -5,7 +5,6 @@ from pilkit.processors import ResizeToFill
 
 class Group(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name='Название группы')
-    course = models.PositiveIntegerField(verbose_name='Курс', blank=True, null=True)
     rules = models.JSONField(blank=True, null=True, help_text="Правила для группы", verbose_name='Правила')
     contract = ProcessedImageField(upload_to='contracts/%Y',
                                    processors=[ResizeToFill(500, 500)],
@@ -16,6 +15,7 @@ class Group(models.Model):
     points = models.PositiveIntegerField(default=0, blank=True, verbose_name='Очки')
     subjects = models.ManyToManyField('Subject', related_name='groups', verbose_name='Предметы')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='groups', verbose_name='Курс', blank=True, null=True)
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, null=True, blank=True,
                                      verbose_name='Учебное заведение')
 

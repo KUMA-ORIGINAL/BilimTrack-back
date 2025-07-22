@@ -19,6 +19,12 @@ WEEK_TYPES = [
 
 
 class Schedule(models.Model):
+    organization = models.ForeignKey(
+        'academics.Organization',
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name='Учебное заведение'
+    )
     groups = models.ManyToManyField(
         'academics.Group',
         verbose_name='Группы'
@@ -64,9 +70,8 @@ class Schedule(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Занятие'
+        verbose_name = 'Расписание'
         verbose_name_plural = 'Расписание'
-        # unique_together тут уже не подходит, т.к. groups - M2M
 
     def __str__(self):
         group_names = ', '.join([str(g) for g in self.groups.all()])
