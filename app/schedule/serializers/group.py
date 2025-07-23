@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from academics.models import Group
-from schedule.serializers import CourseSerializer
+from .course import CourseSerializer
 
 
 class GroupSerializer(serializers.ModelSerializer):
