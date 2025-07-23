@@ -13,6 +13,13 @@ class SubjectSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'photo', 'group', 'created_at', 'makalabox_url']
 
 
+class SubjectMentorSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subject
+        fields = ['id', 'name']
+
+
 class SubjectListSerializer(serializers.ModelSerializer):
 
     class Meta:

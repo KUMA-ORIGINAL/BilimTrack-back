@@ -43,7 +43,7 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
     list_filter = ('role',  ("group", RelatedDropdownFilter),
                    'is_active', 'is_staff', 'is_superuser')
     list_filter_submit = True
-    autocomplete_fields = ('achievements', 'tools', 'skills')
+    autocomplete_fields = ('achievements', 'tools', 'skills', 'mentor_groups', 'mentor_subjects')
     inlines = [WorkExperienceInline, EducationInline]
     list_per_page = 20
 
@@ -68,6 +68,8 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
                        'points', 'rating', 'achievements')}),
         ('Для ментора', {
             'fields': (
+                'mentor_groups',
+                'mentor_subjects',
                 'phone_number',
                 'skills',  # Навыки
                 'tools',  # Инструменты

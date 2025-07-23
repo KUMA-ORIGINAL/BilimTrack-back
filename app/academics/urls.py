@@ -5,11 +5,12 @@ from .views import (GroupViewSet,
                     StudentGradeAPIView,
                     RatingViewSet,
                     PerformanceChartView,
-                    MentorGradeViewSet, MarkAttendanceAPIView)
+                    MentorGradeViewSet, MarkAttendanceAPIView, SubjectMentorViewSet)
 
 router = DefaultRouter()
 router.register(r'groups', GroupViewSet)
 router.register(r'subjects', SubjectViewSet)
+router.register(r'mentor/subjects/me', SubjectMentorViewSet, basename='mentor-subject')
 router.register(r'mentor-grades', MentorGradeViewSet, basename='mentor-grades')
 router.register(r'rating', RatingViewSet, basename='rating')
 

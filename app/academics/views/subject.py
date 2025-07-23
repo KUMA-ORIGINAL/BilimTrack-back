@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from ..models import Subject
-from ..serializers import SubjectSerializer, SubjectListSerializer
+from ..serializers import SubjectSerializer, SubjectListSerializer, SubjectMentorSerializer
 
 
 @extend_schema(tags=['Subject'])
@@ -20,6 +20,9 @@ class SubjectViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     @action(detail=False, methods=['get'], url_path='me', url_name='me')
     def me(self, request):
+        """
+        для студента
+        """
         user = request.user
         group = user.group
         if not group:
@@ -28,3 +31,14 @@ class SubjectViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         subjects = group.subjects.all()
         subjects_serializer = self.get_serializer(subjects, many=True)
         return Response(subjects_serializer.data)
+
+
+@extend_schema(tags=['Subject Mentor'])
+class SubjectMentorViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectMentorSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Subject.objects.filter(mentors=self.request.user.id)
+        return queryset

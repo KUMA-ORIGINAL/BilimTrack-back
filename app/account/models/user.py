@@ -68,7 +68,6 @@ class User(AbstractUser):
         verbose_name=_("Рейтинг")
     )
 
-
     plain_password = models.CharField(
         max_length=20,
         blank=True,
@@ -101,6 +100,19 @@ class User(AbstractUser):
         related_name='users',
         blank=True,
         verbose_name=_("Достижения")
+    )
+
+    mentor_groups = models.ManyToManyField(
+        'academics.Group',
+        related_name='mentors',
+        blank=True,
+        verbose_name='Группы ментора'
+    )
+    mentor_subjects = models.ManyToManyField(
+        'academics.Subject',
+        related_name='mentors',
+        blank=True,
+        verbose_name='Предметы ментора'
     )
 
     group = models.ForeignKey(

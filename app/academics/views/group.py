@@ -56,8 +56,11 @@ class GroupViewSet(viewsets.GenericViewSet):
 
         groups = subject.groups.all()
 
-        if not groups:
-            return Response({"detail": "No groups are associated with this subject."},
+        user_mentor_groups = request.user.mentor_groups.all()
+        groups = groups.filter(id__in=user_mentor_groups.values_list('id', flat=True))
+
+        if not groups.exists():
+            return Response({"detail": "You are not a mentor in any group for this subject."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         group_serializer = self.get_serializer(groups, many=True)
