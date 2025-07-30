@@ -1,7 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from imagekit.models import ProcessedImageField
 from pilkit.processors import ResizeToFill
 
+User = get_user_model()
 
 class Group(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name='Название группы')
@@ -16,6 +18,15 @@ class Group(models.Model):
     subjects = models.ManyToManyField('Subject', related_name='groups', verbose_name='Предметы')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='groups', verbose_name='Курс', blank=True, null=True)
+    curator = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='mentored_groups',
+        verbose_name='Куратор',
+        limit_choices_to={'role': 'mentor'}
+    )
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, null=True, blank=True,
                                      verbose_name='Учебное заведение')
 

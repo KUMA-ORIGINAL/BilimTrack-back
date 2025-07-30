@@ -9,3 +9,17 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'name', 'course']
+
+
+class GroupDetailSerializer(serializers.ModelSerializer):
+    course = CourseSerializer(read_only=True)
+    curator_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Group
+        fields = ['id', 'name', 'course', 'curator_name']
+
+    def get_curator_name(self, obj):
+        if obj.curator:
+            return f"{obj.curator.last_name} {obj.curator.first_name[0].upper()}."
+        return None
