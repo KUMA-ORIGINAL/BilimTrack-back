@@ -4,7 +4,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from ..models import Group, Subject
+from ..models import Group, Subject, GroupSubjectMentor
 from ..serializers import GroupSerializer, MentorGroupSerializer
 
 
@@ -54,10 +54,12 @@ class GroupViewSet(viewsets.GenericViewSet):
             return Response({"detail": "Subject not found."},
                             status=status.HTTP_404_NOT_FOUND)
 
-        groups = subject.groups.all()
+        group_ids = GroupSubjectMentor.objects.filter(
+            subject=subject,
+            mentor=request.user
+        ).values_list('group_id', flat=True)
 
-        user_mentor_groups = request.user.mentor_groups.all()
-        groups = groups.filter(id__in=user_mentor_groups.values_list('id', flat=True))
+        groups = subject.groups.filter(id__in=group_ids)
 
         if not groups.exists():
             return Response({"detail": "You are not a mentor in any group for this subject."},

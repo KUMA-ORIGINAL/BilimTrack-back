@@ -102,19 +102,6 @@ class User(AbstractUser):
         verbose_name=_("Достижения")
     )
 
-    mentor_groups = models.ManyToManyField(
-        'academics.Group',
-        related_name='mentors',
-        blank=True,
-        verbose_name='Группы ментора'
-    )
-    mentor_subjects = models.ManyToManyField(
-        'academics.Subject',
-        related_name='mentors',
-        blank=True,
-        verbose_name='Предметы ментора'
-    )
-
     group = models.ForeignKey(
         'academics.Group',
         on_delete=models.CASCADE,
