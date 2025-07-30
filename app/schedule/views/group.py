@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from academics.models import Group
 from schedule.models import Schedule
 from schedule.serializers import GroupSerializer, GroupDetailSerializer, \
-    ScheduleShortSerializer, GroupWithScheduleSerializer
+    ScheduleGroupShortSerializer, GroupWithScheduleSerializer
 
 
 @extend_schema(tags=['schedule'])
@@ -31,6 +31,6 @@ class GroupViewSet(viewsets.GenericViewSet,
 
         data = {
             'group': GroupDetailSerializer(group).data,
-            'schedule': ScheduleShortSerializer(schedule_qs, many=True).data,
+            'schedule': ScheduleGroupShortSerializer(schedule_qs, many=True).data,
         }
         return Response(data)
