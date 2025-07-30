@@ -111,15 +111,25 @@ class StudentGradeAPIView(generics.RetrieveAPIView):
         return self.request.user
 
     def get(self, request, *args, **kwargs):
-        user = self.get_object()
-        subject_id = int(request.query_params.get('subject_id'))
-        grades = Grade.objects.filter(user=user, subject_id=subject_id)
-        data = {
-            'user': user,
-            'scores': grades
+        user = request.user
+        subject_id = request.query_params.get('subject_id')
+        if not subject_id:
+            return Response({'error': 'subject_id is required'}, status=400)
+
+        # Получаем все занятия по предмету
+        sessions = Session.objects.filter(subject_id=subject_id).order_by('date')
+        sessions_data = SessionShortSerializer(sessions, many=True).data
+
+        grades = Grade.objects.filter(user=user, session__in=sessions)
+        user_data = {
+            "user": UserShortSerializer(user).data,
+            "scores": GradeShortSerializer(grades, many=True).data
         }
-        serializer = self.get_serializer(data)
-        return Response(serializer.data)
+
+        return Response({
+            "sessions": sessions_data,
+            "grades": [user_data]
+        })
 
 
 class MarkAttendanceAPIView(APIView):
