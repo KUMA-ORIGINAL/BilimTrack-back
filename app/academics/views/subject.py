@@ -3,7 +3,7 @@ from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from ..models import Subject
+from ..models import Subject, GroupSubjectMentor
 from ..serializers import SubjectSerializer, SubjectListSerializer, SubjectMentorSerializer
 
 
@@ -40,5 +40,8 @@ class SubjectMentorViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Subject.objects.filter(mentors=self.request.user.id)
-        return queryset
+        # Получить id предметов, где текущий пользователь — наставник
+        subject_ids = GroupSubjectMentor.objects.filter(
+            mentor=self.request.user
+        ).values_list('subject_id', flat=True).distinct()
+        return Subject.objects.filter(id__in=subject_ids)
