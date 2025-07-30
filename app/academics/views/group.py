@@ -59,7 +59,7 @@ class GroupViewSet(viewsets.GenericViewSet):
             mentor=request.user
         ).values_list('group_id', flat=True)
 
-        groups = subject.groups.filter(id__in=group_ids)
+        groups = Group.objects.filter(id__in=group_ids)
 
         if not groups.exists():
             return Response({"detail": "You are not a mentor in any group for this subject."},
