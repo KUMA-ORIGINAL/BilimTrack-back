@@ -1,13 +1,14 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from unfold.admin import ModelAdmin as UnfoldModelAdmin
 from unfold.decorators import display
 
+from common.admin import BaseModelAdmin
 from ..models import Session
 
+
 @admin.register(Session)
-class SessionAdmin(UnfoldModelAdmin):
-    list_display = ('id', 'subject', 'date', 'start_time', 'end_time', 'is_active')
+class SessionAdmin(BaseModelAdmin):
+    list_display = ('id', 'subject', 'date', 'start_time', 'end_time', 'is_active', 'detail_link')
     list_display_links = ('id', 'subject')
     search_fields = ('subject__name',)
     list_filter = ('subject', 'is_active', 'date')

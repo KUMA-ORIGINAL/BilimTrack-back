@@ -28,7 +28,7 @@ class TeacherViewSet(viewsets.GenericViewSet,
         teacher = self.get_object()
         schedule_qs = Schedule.objects.filter(teacher=teacher).select_related(
             'subject', 'room', 'lesson_time'
-        ).prefetch_related('groups')
+        ).prefetch_related('groups').order_by('lesson_time__start_time')
         data = {
             'teacher': TeacherSerializer(teacher).data,
             'schedule': ScheduleTeacherShortSerializer(schedule_qs, many=True).data,

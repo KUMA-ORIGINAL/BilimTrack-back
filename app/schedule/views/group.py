@@ -27,7 +27,7 @@ class GroupViewSet(viewsets.GenericViewSet,
         group = self.get_object()
         schedule_qs = Schedule.objects.filter(groups=group).select_related(
             'subject', 'teacher', 'room', 'lesson_time'
-        ).prefetch_related('groups')
+        ).prefetch_related('groups').order_by('lesson_time__start_time')
 
         data = {
             'group': GroupDetailSerializer(group).data,

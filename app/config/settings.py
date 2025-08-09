@@ -237,6 +237,7 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'CAMELIZE_NAMES': True,
+    'COMPONENT_SPLIT_REQUEST': True,
 
     'POSTPROCESSING_HOOKS': [
         'drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields',
@@ -265,6 +266,13 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
     'UPDATE_LAST_LOGIN': True,
 }
+
+# Payments / Absences
+ABSENCE_PAYMENT_AMOUNT = env('ABSENCE_PAYMENT_AMOUNT', default=500)
+ABSENCE_PAYMENT_CURRENCY = env('ABSENCE_PAYMENT_CURRENCY', default='KGS')
+PAY_OPERATOR_TOKEN = env('PAY_OPERATOR_TOKEN', default=None)
+PAY_OPERATOR_API_URL = env('PAY_OPERATOR_API_URL', default='https://pay.operator.kg/api/v1/payments/make-payment-link/')
+FRONTEND_URL = env('FRONTEND_URL', default='http://localhost:3000')
 
 DJOSER = {
     # 'SERIALIZERS': {
@@ -360,6 +368,21 @@ UNFOLD = {
                         "link": reverse_lazy("admin:academics_session_changelist"),
                     },
                 ]
+            },
+            {
+                "title": _("Платежи"),
+                "items": [
+                    {
+                        "title": _("Список платежей"),
+                        "icon": "payment",
+                        "link": reverse_lazy("admin:academics_payment_changelist"),
+                    },
+                    {
+                        "title": _("Платёжные токены организаций"),
+                        "icon": "key",
+                        "link": reverse_lazy("admin:academics_paymenttoken_changelist"),
+                    },
+                ],
             },
             {
                 "title": _("Расписание"),

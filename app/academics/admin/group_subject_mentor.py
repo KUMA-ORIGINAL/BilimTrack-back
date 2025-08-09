@@ -1,12 +1,12 @@
 from django.contrib import admin
-from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
+from common.admin import BaseModelAdmin
 from ..models import GroupSubjectMentor
 
 
 @admin.register(GroupSubjectMentor)
-class GroupSubjectMentorAdmin(UnfoldModelAdmin):
-    list_display = ('id', 'group', 'subject', 'mentor', 'created_at', 'updated_at')
+class GroupSubjectMentorAdmin(BaseModelAdmin):
+    list_display = ('id', 'group', 'subject', 'mentor', 'created_at', 'updated_at', 'detail_link')
     list_display_links = ('id', 'group',)
     list_filter = ('group', 'subject', 'mentor')
     search_fields = (

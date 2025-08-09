@@ -1,13 +1,13 @@
 from django.contrib import admin
 
-from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
+from common.admin import BaseModelAdmin
 from ..models import Group
 
 
 @admin.register(Group)
-class GroupAdmin(UnfoldModelAdmin):
-    list_display = ('id', 'name', 'organization', 'points')
+class GroupAdmin(BaseModelAdmin):
+    list_display = ('id', 'name', 'organization', 'points', 'detail_link')
     list_display_links = ('id', 'name',)
     list_filter = ('organization',)
     search_fields = ('name',)

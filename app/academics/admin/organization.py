@@ -1,10 +1,10 @@
 from django.contrib import admin
-from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
+from common.admin import BaseModelAdmin
 from ..models import Organization
 
 
 @admin.register(Organization)
-class OrganizationAdmin(UnfoldModelAdmin):
-    list_display = ('id', 'name',)
+class OrganizationAdmin(BaseModelAdmin):
+    list_display = ('id', 'name', 'detail_link')
     search_fields = ('name',)

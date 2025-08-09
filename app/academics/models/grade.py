@@ -23,6 +23,8 @@ class Grade(models.Model):
     session = models.ForeignKey('Session', on_delete=models.CASCADE, verbose_name='Занятие', null=True, blank=True)
     grade = models.IntegerField(choices=GRADE_CHOICES, verbose_name='Оценка')
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
+    make_up_link = models.URLField(blank=True, null=True, verbose_name='Ссылка на отработку')
+    make_up_file = models.FileField(upload_to='makeup_submissions/%Y/%m', blank=True, null=True, verbose_name='Файл отработки')
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')

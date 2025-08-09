@@ -1,14 +1,14 @@
 from django.contrib import admin
 
-from unfold.admin import ModelAdmin as UnfoldModelAdmin
 from unfold.contrib.filters.admin import RelatedDropdownFilter
 
 from academics.models import Grade
+from common.admin import BaseModelAdmin
 
 
 @admin.register(Grade)
-class GradeAdmin(UnfoldModelAdmin):
-    list_display = ('user', 'session', 'grade', 'comment',)  # отображаемые поля
+class GradeAdmin(BaseModelAdmin):
+    list_display = ('user', 'session', 'grade', 'comment', 'detail_link')  # отображаемые поля
     ordering = ('-created_at',)  # сортировка по дате создания
     readonly_fields = ('created_at', 'updated_at')
 
