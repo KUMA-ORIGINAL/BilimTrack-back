@@ -5,8 +5,9 @@ from .views import (GroupViewSet,
                     StudentGradeAPIView,
                     RatingViewSet,
                     PerformanceChartView,
-                    MentorGradeViewSet, MarkAttendanceAPIView, SubjectMentorViewSet)
+                    MentorGradeViewSet, MarkAttendanceAPIView, SubjectMentorViewSet, LessonTopicListCreateView)
 from .views.payment import AbsencePaymentCreateAPIView, MakeUpSubmissionAPIView, PaymentWebhookViewSet
+from .views.session import SessionUpdateView
 
 router = DefaultRouter()
 router.register(r'groups', GroupViewSet)
@@ -20,6 +21,8 @@ urlpatterns = [
     path('student-grades/me/',StudentGradeAPIView.as_view()),
     path('performance-chart/me/', PerformanceChartView.as_view()),
     path('attendance/mark/', MarkAttendanceAPIView.as_view(), name='mark-attendance'),
+    path('mentor/lesson-topics/', LessonTopicListCreateView.as_view(), name='mentor-lesson-topic-list-create'),
+    path('mentor/sessions/', SessionUpdateView.as_view(), name='session-topic-update'),
 
     # Payments & Make-up
     path('payments/absence/create/', AbsencePaymentCreateAPIView.as_view(), name='absence-payment-create'),
