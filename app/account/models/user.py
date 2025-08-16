@@ -32,6 +32,7 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('student', 'Студент'),
         ('mentor', 'Ментор'),
+        ('scheduler', 'Составитель расписания'),
     )
 
     email = models.EmailField(_("Адрес электронной почты"), blank=True)

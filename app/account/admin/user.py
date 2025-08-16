@@ -62,7 +62,7 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
             },
         ),
         ("Dates", {"fields": ("last_login", "date_joined")}),
-        ("Общее", {"fields": ('email', 'first_name', 'last_name', 'role', 'photo',)}),
+        ("Общее", {"fields": ('email', 'first_name', 'last_name', 'role', 'photo', 'organization')}),
         ('Для студента', {
             'fields': ('group', 'achievements_count',
                        'points', 'rating', 'achievements')}),

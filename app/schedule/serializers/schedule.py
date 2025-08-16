@@ -93,6 +93,7 @@ class ScheduleCreateUpdateSerializer(serializers.ModelSerializer):
         model = Schedule
         fields = [
             'id',
+            'education_level',
             'groups',
             'subject',
             'teacher',

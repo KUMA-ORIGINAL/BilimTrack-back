@@ -25,6 +25,13 @@ class Schedule(models.Model):
         null=True, blank=True,
         verbose_name='Учебное заведение'
     )
+    education_level = models.ForeignKey(
+        'academics.EducationLevel',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        verbose_name='Уровень образования',
+        related_name='schedules'
+    )
     groups = models.ManyToManyField(
         'academics.Group',
         verbose_name='Группы'
@@ -74,5 +81,6 @@ class Schedule(models.Model):
         verbose_name_plural = 'Расписание'
 
     def __str__(self):
+        level = f" [{self.education_level}]" if self.education_level else ""
         group_names = ', '.join([str(g) for g in self.groups.all()])
-        return f"{group_names} - {self.subject} ({self.get_day_of_week_display()}, {self.lesson_time})"
+        return f"{self.organization}{level} - {group_names} - {self.subject} ({self.get_day_of_week_display()}, {self.lesson_time})"

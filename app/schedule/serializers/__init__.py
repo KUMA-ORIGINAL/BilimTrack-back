@@ -6,3 +6,4 @@ from .teacher import *
 from .subject import *
 from .group import *
 from .course import *
+from .education_level import *
