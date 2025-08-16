@@ -70,13 +70,12 @@ class AbsencePaymentCreateAPIView(APIView):
         # pay_url = generate_payment_link(payment, redirect_url=redirect_url)
         pay_url = 'https://paylink.bakai.kg/25dc79fe-eca4-4e50-a02a-bbf91e332828'
 
+        if not payment.payment_link:
+            payment.payment_link = pay_url
+            payment.save(update_fields=["payment_link"])
+
         data = PaymentSerializer(payment).data
-        if pay_url:
-            return Response(data, status=status.HTTP_201_CREATED)
-        return Response(
-            {"detail": "Не удалось сформировать ссылку на оплату", "payment": data},
-            status=status.HTTP_502_BAD_GATEWAY,
-        )
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(
