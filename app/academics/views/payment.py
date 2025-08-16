@@ -63,6 +63,7 @@ class AbsencePaymentCreateAPIView(APIView):
                 grade=grade,
                 amount=getattr(settings, "ABSENCE_PAYMENT_AMOUNT", 500),
                 status=Payment.Status.PENDING,
+                organization=user.organization,
             )
 
         redirect_url = f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')}/payments/{payment.id}/success"
