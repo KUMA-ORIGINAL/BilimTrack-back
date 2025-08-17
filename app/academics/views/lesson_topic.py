@@ -1,13 +1,12 @@
+from rest_framework import viewsets, permissions
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-from rest_framework import generics, permissions
+
 from ..models import LessonTopic
 from ..serializers import LessonTopicSerializer
 
 
 @extend_schema(
-    tags=["Mentor"],
-    summary="Список и создание тем уроков",
-    description="Ментор может получать список и создавать темы только для своих предметов.",
+    tags=["Mentor Lesson Topics"],
     parameters=[
         OpenApiParameter(
             name="subject",
@@ -17,9 +16,8 @@ from ..serializers import LessonTopicSerializer
             required=False
         )
     ],
-    responses={200: LessonTopicSerializer(many=True)}
 )
-class LessonTopicListCreateView(generics.ListCreateAPIView):
+class LessonTopicViewSet(viewsets.ModelViewSet):
     serializer_class = LessonTopicSerializer
     permission_classes = [permissions.IsAuthenticated]
 

@@ -1,16 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
-from django.db.models.functions import TruncDate
 from rest_framework import serializers
 
 from academics.models import Grade
-from academics.serializers import PerformanceChartSerializer
+from academics.serializers import PerformanceChartSerializer, OrganizationSerializer
 from .education import EducationSerializer
 from .skill import SkillSerializer
 from .tool import ToolSerializer
 from .achievement import AchievementSerializer
 from .work_experience import WorkExperienceSerializer
-from ..models import Skill, WorkExperience, Education
+from ..models import WorkExperience, Education
 
 User = get_user_model()
 
@@ -24,6 +23,7 @@ class MeSerializer(serializers.ModelSerializer):
     tools = ToolSerializer(many=True)
     work_experiences = WorkExperienceSerializer(many=True, read_only=True)
     educations = EducationSerializer(many=True, read_only=True)
+    organization = OrganizationSerializer(read_only=True)
 
     class Meta:
         model = User
@@ -35,7 +35,7 @@ class MeSerializer(serializers.ModelSerializer):
         if instance.role == 'student':
             allowed_fields = (
                 'id', 'email', 'username', 'first_name', 'last_name',
-                'photo', 'role', 'group', 'achievements_count', 'points', 'rating',
+                'photo', 'role', 'group', 'organization', 'achievements_count', 'points', 'rating',
                 'achievements', 'performance')
         elif instance.role == 'mentor':
             allowed_fields = (
@@ -46,6 +46,7 @@ class MeSerializer(serializers.ModelSerializer):
                 'email',
                 'phone_number',
                 'photo',
+                'organization',
                 'skills',
                 'mentor_achievements',
                 'instagram',
@@ -53,7 +54,7 @@ class MeSerializer(serializers.ModelSerializer):
                 'whatsapp',
                 'facebook',
                 'educations',
-                'work_experiences',  # если нужно отобразить связь с опытом работы (например, через related_name)
+                'work_experiences',
             )
         else:
             allowed_fields = ('username', 'first_name', 'last_name')
