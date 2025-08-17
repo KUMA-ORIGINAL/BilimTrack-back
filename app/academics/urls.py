@@ -22,7 +22,7 @@ urlpatterns = [
     path('student-grades/me/',StudentGradeAPIView.as_view()),
     path('performance-chart/me/', PerformanceChartView.as_view()),
     path('attendance/mark/', MarkAttendanceAPIView.as_view(), name='mark-attendance'),
-    path('mentor/sessions/<int:pk>/', SessionUpdateView.as_view(), name='session-topic-update'),
+    path('mentor/sessions/<str:pk>/', SessionUpdateView.as_view(), name='session-topic-update'),
 
     # Payments & Make-up
     path('payments/absence/create/', AbsencePaymentCreateAPIView.as_view(), name='absence-payment-create'),
