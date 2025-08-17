@@ -43,12 +43,11 @@ class GradeShortSerializer(serializers.ModelSerializer):
 
 
 class SessionShortSerializer(serializers.ModelSerializer):
-    sessionId = serializers.UUIDField(source='id')
     date = serializers.DateField(format='%d-%m-%Y')
 
     class Meta:
         model = Session
-        fields = ('id', 'sessionId', 'date')
+        fields = ('id', 'date')
 
 
 class GradeListSerializer(serializers.Serializer):
