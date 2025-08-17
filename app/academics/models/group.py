@@ -27,8 +27,15 @@ class Group(models.Model):
         verbose_name='Куратор',
         limit_choices_to={'role': 'mentor'}
     )
-    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, null=True, blank=True,
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE,
                                      verbose_name='Учебное заведение')
+    education_level = models.ForeignKey(
+        'academics.EducationLevel',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        verbose_name='Уровень образования',
+        related_name='groups'
+    )
 
     def __str__(self):
         return self.name

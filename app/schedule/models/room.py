@@ -10,6 +10,11 @@ class Room(models.Model):
         max_length=50,
         verbose_name='Здание'
     )
+    organization = models.ForeignKey(
+        'academics.Organization',
+        on_delete=models.CASCADE,
+        verbose_name='Учебное заведение'
+    )
 
     class Meta:
         verbose_name = 'Аудитория'

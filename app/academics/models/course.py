@@ -10,6 +10,13 @@ class Course(models.Model):
         blank=True,
         verbose_name='Учебное заведение'
     )
+    education_level = models.ForeignKey(
+        'academics.EducationLevel',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        verbose_name='Уровень образования',
+        related_name='courses'
+    )
 
     class Meta:
         verbose_name = 'Курс'

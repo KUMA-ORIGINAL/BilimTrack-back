@@ -29,7 +29,9 @@ class ScheduleSerializer(serializers.ModelSerializer):
             'lesson_type',
             'day_of_week',
             "week_type",
+            'education_level'
         ]
+
 
 class ScheduleGroupShortSerializer(serializers.ModelSerializer):
     subject = SubjectSerializer(read_only=True)

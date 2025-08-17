@@ -8,6 +8,11 @@ class LessonTime(models.Model):
     end_time = models.TimeField(
         verbose_name='Время окончания'
     )
+    organization = models.ForeignKey(
+        'academics.Organization',
+        on_delete=models.CASCADE,
+        verbose_name='Учебное заведение'
+    )
 
     class Meta:
         verbose_name = 'Время пары'

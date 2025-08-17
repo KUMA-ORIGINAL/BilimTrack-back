@@ -10,6 +10,6 @@ class CourseViewSet(viewsets.GenericViewSet,
                     mixins.ListModelMixin):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    filterset_fields = ['organization', 'number']
+    filterset_fields = ['organization', 'education_level', 'number']
     search_fields = ['number', 'organization__name']
     ordering_fields = ['number', 'organization']
