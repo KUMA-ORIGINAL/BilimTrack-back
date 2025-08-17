@@ -15,6 +15,18 @@ class Organization(models.Model):
         max_length=255,
         verbose_name='Вебсайт'
     )
+    news_api = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name='API для новостей'
+    )
+    events_api = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name='API для мероприятий'
+    )
 
     def __str__(self):
         return self.name
