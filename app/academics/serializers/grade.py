@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from .lesson_topic import LessonTopicShortSerializer
 from ..models import Grade, Session, Payment
 
 User = get_user_model()
@@ -44,10 +45,11 @@ class GradeShortSerializer(serializers.ModelSerializer):
 
 class SessionShortSerializer(serializers.ModelSerializer):
     date = serializers.DateField(format='%d-%m-%Y')
+    topic = LessonTopicShortSerializer()
 
     class Meta:
         model = Session
-        fields = ('id', 'date')
+        fields = ('id', 'date', 'topic')
 
 
 class GradeListSerializer(serializers.Serializer):

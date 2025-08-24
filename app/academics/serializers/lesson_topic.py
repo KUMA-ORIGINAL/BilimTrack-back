@@ -13,3 +13,9 @@ class LessonTopicSerializer(serializers.ModelSerializer):
         """
         validated_data['mentor'] = self.context['request'].user
         return super().create(validated_data)
+
+
+class LessonTopicShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LessonTopic
+        fields = ["id", "title"]
