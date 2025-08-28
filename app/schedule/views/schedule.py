@@ -38,3 +38,6 @@ class ScheduleViewSet(viewsets.GenericViewSet,
             queryset = queryset.filter(organization=user.organization)
 
         return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(organization=self.request.user.organization)
