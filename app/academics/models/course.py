@@ -21,9 +21,9 @@ class Course(models.Model):
     class Meta:
         verbose_name = 'Курс'
         verbose_name_plural = 'Курсы'
-        unique_together = ('number', 'organization')
+        unique_together = ('number', 'organization', 'education_level')
         ordering = ['organization', 'number']
 
     def __str__(self):
-        org = f"{self.organization}" if self.organization else "Общее"
-        return f"{self.number} курс ({org})"
+        edu_level = f"{self.education_level}" if self.education_level else "Общее"
+        return f"{self.number} курс ({edu_level})"

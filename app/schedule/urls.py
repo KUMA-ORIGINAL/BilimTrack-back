@@ -12,7 +12,7 @@ router.register(r'subjects', views.SubjectViewSet, basename='subject')
 router.register(r'groups', views.GroupViewSet, basename='group')
 router.register(r'courses', views.CourseViewSet, basename='course')
 router.register(r'education-levels', views.EducationLevelViewSet, basename='education_level')
-router.register('', views.ScheduleViewSet)
+router.register('', views.ScheduleViewSet, basename='schedule')
 
 urlpatterns = [
     path('schedules/', include(router.urls)),

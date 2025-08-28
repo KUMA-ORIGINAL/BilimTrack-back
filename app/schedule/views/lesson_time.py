@@ -11,5 +11,13 @@ class LessonTimeViewSet(viewsets.GenericViewSet,
     """
     ViewSet для получения списка времён занятий.
     """
-    queryset = LessonTime.objects.all()
     serializer_class = LessonTimeSerializer
+
+    def get_queryset(self):
+        queryset = LessonTime.objects.all()
+        user = self.request.user
+
+        if getattr(user, "organization_id", None):
+            queryset = queryset.filter(organization=user.organization)
+
+        return queryset

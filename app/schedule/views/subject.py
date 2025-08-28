@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, mixins
 
@@ -11,5 +12,15 @@ class SubjectViewSet(viewsets.GenericViewSet,
     """
     ViewSet для получения списка предметов.
     """
-    queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_fields = ['education_level', ]
+
+    def get_queryset(self):
+        queryset = Subject.objects.all()
+        user = self.request.user
+
+        if getattr(user, "organization_id", None):
+            queryset = queryset.filter(organization=user.organization)
+
+        return queryset

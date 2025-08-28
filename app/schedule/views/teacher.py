@@ -17,7 +17,13 @@ class TeacherViewSet(viewsets.GenericViewSet,
     serializer_class = TeacherSerializer
 
     def get_queryset(self):
-        return User.objects.filter(role='mentor')
+        queryset = User.objects.filter(role='mentor')
+        user = self.request.user
+
+        if getattr(user, "organization_id", None):
+            queryset = queryset.filter(organization=user.organization)
+
+        return queryset
 
     @extend_schema(
         responses=TeacherWithScheduleSerializer,

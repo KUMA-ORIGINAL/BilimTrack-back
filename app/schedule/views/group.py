@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
@@ -15,8 +16,18 @@ class GroupViewSet(viewsets.GenericViewSet,
     """
     ViewSet для получения списка учебных групп.
     """
-    queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_fields = ['education_level', ]
+
+    def get_queryset(self):
+        queryset = Group.objects.all()
+        user = self.request.user
+
+        if getattr(user, "organization_id", None):
+            queryset = queryset.filter(organization=user.organization)
+
+        return queryset
 
     @extend_schema(
         responses=GroupWithScheduleSerializer,

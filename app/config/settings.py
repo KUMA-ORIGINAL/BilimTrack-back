@@ -398,6 +398,11 @@ UNFOLD = {
                         "link": lambda request: f"{reverse_lazy('admin:account_user_changelist')}?role__exact=mentor",
                     },
                     {
+                        "title": _("Составители расписания"),
+                        "icon": "person",
+                        "link": lambda request: f"{reverse_lazy('admin:account_user_changelist')}?role__exact=scheduler",
+                    },
+                    {
                         "title": _("Аудитории"),
                         "icon": "location_on",
                         "link": reverse_lazy("admin:schedule_room_changelist"),

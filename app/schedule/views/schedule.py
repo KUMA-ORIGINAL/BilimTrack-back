@@ -12,11 +12,9 @@ class ScheduleViewSet(viewsets.GenericViewSet,
                       mixins.CreateModelMixin,
                       mixins.UpdateModelMixin,
                       mixins.DestroyModelMixin):
-    queryset = Schedule.objects.select_related(
-        'subject', 'teacher', 'room', 'lesson_time'
-    ).prefetch_related('groups').all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = [
+        'education_level',
         'groups', 'teacher', 'subject', 'room',
         'day_of_week', 'lesson_time', 'lesson_type'
     ]
@@ -29,3 +27,14 @@ class ScheduleViewSet(viewsets.GenericViewSet,
         if self.action in ['create', 'update', 'partial_update']:
             return ScheduleCreateUpdateSerializer
         return ScheduleSerializer
+
+    def get_queryset(self):
+        queryset = Schedule.objects.select_related(
+            'subject', 'teacher', 'room', 'lesson_time'
+        ).prefetch_related('groups').all()
+        user = self.request.user
+
+        if getattr(user, "organization_id", None):
+            queryset = queryset.filter(organization=user.organization)
+
+        return queryset

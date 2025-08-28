@@ -10,6 +10,15 @@ class EducationLevelViewSet(viewsets.GenericViewSet,
                             mixins.ListModelMixin):
     """
     ViewSet для получения списка уровней образования.
+    Фильтрация по organization пользователя.
     """
-    queryset = EducationLevel.objects.all()
     serializer_class = EducationLevelSerializer
+
+    def get_queryset(self):
+        queryset = EducationLevel.objects.all()
+        user = self.request.user
+
+        if getattr(user, "organization_id", None):
+            queryset = queryset.filter(organization=user.organization)
+
+        return queryset

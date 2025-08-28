@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, mixins
 
@@ -8,8 +9,15 @@ from ..serializers import CourseSerializer
 @extend_schema(tags=['schedule'])
 class CourseViewSet(viewsets.GenericViewSet,
                     mixins.ListModelMixin):
-    queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    filterset_fields = ['organization', 'education_level', 'number']
-    search_fields = ['number', 'organization__name']
-    ordering_fields = ['number', 'organization']
+    filter_backends = [DjangoFilterBackend,]
+    filterset_fields = ['education_level',]
+
+    def get_queryset(self):
+        queryset = Course.objects.all()
+        user = self.request.user
+
+        if getattr(user, "organization_id", None):
+            queryset = queryset.filter(organization=user.organization)
+
+        return queryset

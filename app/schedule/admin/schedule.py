@@ -8,14 +8,17 @@ from ..models import Schedule
 class ScheduleAdmin(UnfoldModelAdmin):
     list_display = (
         'id', 'get_groups', 'subject', 'teacher',
-        'day_of_week', 'week_type', 'lesson_time', 'lesson_type', 'room'
+        'day_of_week', 'week_type', 'lesson_time', 'lesson_type', 'room',
+        'education_level', 'organization'
     )
     list_display_links = ('id', 'subject')
     list_filter = (
         'day_of_week',
         'lesson_type',
         ('groups', admin.RelatedOnlyFieldListFilter),
-        'teacher'
+        'teacher',
+        'education_level',
+        'organization'
     )
     search_fields = (
         'subject__name',

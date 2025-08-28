@@ -11,5 +11,13 @@ class RoomViewSet(viewsets.GenericViewSet,
     """
     ViewSet для получения списка аудиторий.
     """
-    queryset = Room.objects.all()
     serializer_class = RoomSerializer
+
+    def get_queryset(self):
+        queryset = Room.objects.all()
+        user = self.request.user
+
+        if getattr(user, "organization_id", None):
+            queryset = queryset.filter(organization=user.organization)
+
+        return queryset
