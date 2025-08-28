@@ -57,7 +57,7 @@ class MeSerializer(serializers.ModelSerializer):
                 'work_experiences',
             )
         else:
-            allowed_fields = ('username', 'first_name', 'last_name')
+            allowed_fields = ('username', 'first_name', 'last_name', 'role')
 
         return {field: representation[field] for field in allowed_fields if field in representation}
 
