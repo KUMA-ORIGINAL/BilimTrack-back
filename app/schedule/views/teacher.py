@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
@@ -15,6 +16,8 @@ class TeacherViewSet(viewsets.GenericViewSet,
     ViewSet для получения списка преподавателей (роль mentor).
     """
     serializer_class = TeacherSerializer
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_fields = ['organization', ]
 
     def get_queryset(self):
         queryset = User.objects.filter(role='mentor')
