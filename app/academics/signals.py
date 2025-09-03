@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -19,18 +20,22 @@ def update_points_on_delete(sender, instance, **kwargs):
 def update_user_and_group_points(grade_instance):
     user = grade_instance.user
 
-    # считаем сумму баллов пользователя
+    # посчитать сумму баллов
     user_points = user.grade_set.aggregate(total=models.Sum('grade'))['total'] or 0
     user.points = user_points
     user.save(update_fields=["points"])
 
-    # обновляем рейтинг пользователей целиком
+    # обновить рейтинг всех пользователей
     update_users_rating()
 
-    # если у пользователя есть группа – обновляем её очки
-    group = getattr(user, "group", None)
-    if group is not None:
-        group.update_group_points()
+    # через group_id проверяем есть ли ссылка у юзера
+    if user.group_id:
+        try:
+            group = user.group  # попытка получить объект
+            group.update_group_points()
+        except ObjectDoesNotExist:
+            # группа удалена или не существует
+            pass
 
 def update_users_rating():
     all_users = User.objects.order_by('-points')
