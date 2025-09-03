@@ -51,6 +51,14 @@ services:
           cpus: '1'
           memory: 1G
 
+  frontend:
+    build:
+      context: ../bilimtrack/
+      dockerfile: Dockerfile
+    restart: always
+    expose:
+      - "80"
+
   nginx:
     build: nginx
     env_file: .env.prod
@@ -64,6 +72,7 @@ services:
       - certs:/etc/letsencrypt
     depends_on:
       - application
+      - frontend
 
 volumes:
   database-storage:

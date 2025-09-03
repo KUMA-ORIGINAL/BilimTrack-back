@@ -191,15 +191,31 @@ AUTH_USER_MODEL = 'account.User'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
     },
-    'django': {
-        'handlers': ['console'],
-        'level': 'INFO',  # или DEBUG для детальных логов
+     'handlers': {
+        'console': {
+            'level': 'INFO',  # Можно изменить на 'DEBUG' для более подробного вывода
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'level': 'INFO',  # Логи с уровнем DEBUG и выше будут записываться в файл
+            'class': 'logging.FileHandler',
+            'filename': 'django_app.log',
+            'formatter': 'verbose',
+        },
     },
+    'loggers': {
+        'root': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    }
 }
 
 
@@ -462,26 +478,14 @@ UNFOLD = {
                         "icon": "psychology",
                         "link": reverse_lazy("admin:account_skill_changelist"),
                     },
-                    # {
-                    #     "title": _("Группы"),
-                    #     "icon": "group",
-                    #     "link": reverse_lazy("admin:auth_group_changelist"),
-                    #     "permission": "account.utils.permission_callback",
-                    # },
+                    {
+                        "title": _("Группы"),
+                        "icon": "group",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                        "permission": "account.utils.permission_callback",
+                    },
                 ],
             },
         ],
     },
-    # "TABS": [
-    #     {
-    #         "models": ["venues.venue"],
-    #         "items": [
-    #             {
-    #                 "title": "Генерация qr-code",
-    #                 "icon": "grade",
-    #                 "link": reverse_lazy("admin:qr"),
-    #             },
-    #         ],
-    #     },
-    # ],
 }
