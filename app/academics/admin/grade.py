@@ -11,7 +11,6 @@ class GradeAdmin(BaseModelAdmin):
     list_display = ('user', 'session', 'grade', 'comment', 'detail_link')  # отображаемые поля
     ordering = ('-created_at',)  # сортировка по дате создания
     readonly_fields = ('created_at', 'updated_at')
-
     list_filter = (
         ("user", RelatedDropdownFilter),
         ("session", RelatedDropdownFilter),
@@ -19,6 +18,7 @@ class GradeAdmin(BaseModelAdmin):
         'created_at',
     )
     list_filter_submit = True
+    list_per_page = 50
 
     fieldsets = (
         (None, {
