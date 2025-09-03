@@ -196,14 +196,14 @@ LOGGING = {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
     },
-     'handlers': {
+    'handlers': {
         'console': {
-            'level': 'INFO',  # Можно изменить на 'DEBUG' для более подробного вывода
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
         'file': {
-            'level': 'INFO',  # Логи с уровнем DEBUG и выше будут записываться в файл
+            'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': 'django_app.log',
             'formatter': 'verbose',
@@ -440,26 +440,26 @@ UNFOLD = {
                     },
                 ],
             },
-            {
-                "title": _("Достижения"),
-                "items": [
-                    {
-                        "title": _("Достижения"),
-                        "icon": "trophy",
-                        "link": reverse_lazy("admin:account_achievement_changelist"),
-                    },
-                    {
-                        "title": _("Редкости"),
-                        "icon": "category",
-                        "link": reverse_lazy("admin:account_rarity_changelist"),
-                    },
-                    {
-                        "title": _("Пользовательские достижения"),
-                        "icon": "rewarded_ads",
-                        "link": reverse_lazy("admin:account_userachievement_changelist"),
-                    },
-                ]
-            },
+            # {
+            #     "title": _("Достижения"),
+            #     "items": [
+            #         {
+            #             "title": _("Достижения"),
+            #             "icon": "trophy",
+            #             "link": reverse_lazy("admin:account_achievement_changelist"),
+            #         },
+            #         {
+            #             "title": _("Редкости"),
+            #             "icon": "category",
+            #             "link": reverse_lazy("admin:account_rarity_changelist"),
+            #         },
+            #         {
+            #             "title": _("Пользовательские достижения"),
+            #             "icon": "rewarded_ads",
+            #             "link": reverse_lazy("admin:account_userachievement_changelist"),
+            #         },
+            #     ]
+            # },
             {
                 "title": _("Пользователи"),
                 "items": [
@@ -482,7 +482,6 @@ UNFOLD = {
                         "title": _("Группы"),
                         "icon": "group",
                         "link": reverse_lazy("admin:auth_group_changelist"),
-                        "permission": "account.utils.permission_callback",
                     },
                 ],
             },
