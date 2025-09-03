@@ -19,15 +19,17 @@ def update_points_on_delete(sender, instance, **kwargs):
 def update_user_and_group_points(grade_instance):
     user = grade_instance.user
 
+    # считаем сумму баллов пользователя
     user_points = user.grade_set.aggregate(total=models.Sum('grade'))['total'] or 0
     user.points = user_points
-    user.save()
+    user.save(update_fields=["points"])
 
-    # Обновляем рейтинг пользователя
+    # обновляем рейтинг пользователей целиком
     update_users_rating()
 
-    group = user.group
-    if group:
+    # если у пользователя есть группа – обновляем её очки
+    group = getattr(user, "group", None)
+    if group is not None:
         group.update_group_points()
 
 def update_users_rating():
