@@ -14,6 +14,13 @@ class Subject(models.Model):
                                 verbose_name='Фото')
     makalabox_url = models.URLField(blank=True, verbose_name='Ссылка на Makalabox')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    semester = models.ForeignKey(
+        'Semester',
+        on_delete=models.CASCADE,
+        related_name='subjects',
+        verbose_name='Семестр',
+        null=True,
+    )
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, verbose_name='Учебное заведение')
     education_level = models.ForeignKey(
         'academics.EducationLevel',

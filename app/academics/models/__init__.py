@@ -8,3 +8,4 @@ from .group_subject_mentor import *
 from .payments import *
 from .lesson_topic import *
 from .education_level import *
+from .semester import *

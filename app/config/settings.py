@@ -364,6 +364,11 @@ UNFOLD = {
                         "link": reverse_lazy("admin:academics_course_changelist"),
                     },
                     {
+                        "title": _("Семестры"),
+                        "icon": "calendar_month",  # или, например, "date_range", "event" — в зависимости от набора иконок
+                        "link": reverse_lazy("admin:academics_semester_changelist"),
+                    },
+                    {
                         "title": _("Группы"),
                         "icon": "groups",
                         "link": reverse_lazy("admin:academics_group_changelist"),

@@ -38,6 +38,12 @@ class User(AbstractUser):
     email = models.EmailField(_("Адрес электронной почты"), blank=True)
     first_name = models.CharField(max_length=100, verbose_name=_("Имя"), blank=True)
     last_name = models.CharField(max_length=100, verbose_name=_("Фамилия"), blank=True)
+    patronymic = models.CharField(
+        max_length=100,
+        verbose_name=_("Отчество"),
+        blank=True,
+        null=True  # если хотите разрешить NULL в БД
+    )
     phone_number = models.CharField("Номер телефона", max_length=20, blank=True)
     photo = ProcessedImageField(
         upload_to='user_photos/%Y/%m',

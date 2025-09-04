@@ -11,4 +11,3 @@ class GroupAdmin(BaseModelAdmin):
     list_display_links = ('id', 'name',)
     list_filter = ('organization', 'education_level')
     search_fields = ('name',)
-    autocomplete_fields = ('subjects',)

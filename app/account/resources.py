@@ -57,3 +57,67 @@ class UserResource(resources.ModelResource):
 
     def dehydrate_group(self, instance):
         return instance.group.name if instance.group else ''
+
+
+class MentorResource(resources.ModelResource):
+    class Meta:
+        model = User
+        exclude = ('id',)
+        import_id_fields = ()
+        fields = (
+            'first_name',
+            'last_name',
+            'patronymic',
+            'email',
+            'organization',
+            'role',
+            'username',
+            'plain_password',
+        )
+
+    def before_import_row(self, row, **kwargs):
+        first_name = row.get('first_name', '').strip()
+        last_name = row.get('last_name', '').strip()
+        patronymic = row.get('patronymic', '').strip()
+        email = row.get('email', '').strip()
+        organization_id = row.get('organization')
+
+        logger.info(
+            f"📥 Импортируем МЕНТОРА: {last_name} {first_name} {patronymic}, org={organization_id}, email={email}"
+        )
+
+        if User.objects.filter(
+            first_name=first_name, last_name=last_name, patronymic=patronymic, organization_id=organization_id
+        ).exists():
+            logger.warning(f"⚠️ Пропущен: {last_name} {first_name} {patronymic} уже существует в организации {organization_id}")
+            raise Exception(f"Ментор {first_name} {last_name} уже существует в организации {organization_id}")
+
+        try:
+            transliterated = unidecode(f"{last_name}{first_name[0]}")  # ИвановИ
+            base_username = slugify(transliterated).lower()
+        except Exception as e:
+            logger.error(f"❌ Ошибка при генерации username: {e}")
+            raise
+
+        if not base_username:
+            logger.error("❌ slugify вернул пустую строку — проверь имя/фамилию")
+            raise Exception(f"Невозможно сгенерировать username из: {last_name} {first_name}")
+
+        username = base_username
+        pin = str(random.randint(0, 9999)).zfill(4)
+
+        logger.info(f"✅ Сгенерирован логин для ментора: {username}, PIN: {pin}")
+
+        row['username'] = username
+        row['plain_password'] = pin
+        row['_raw_password'] = pin
+        row['role'] = 'mentor'   # фиксируем роль при импорте
+
+    def before_save_instance(self, instance, row, **kwargs):
+        raw_password = row.get('_raw_password')
+        if raw_password:
+            instance.set_password(raw_password)
+            instance.plain_password = raw_password
+
+    def dehydrate_organization(self, instance):
+        return instance.organization.name if instance.organization else ''
