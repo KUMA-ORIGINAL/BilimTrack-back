@@ -28,11 +28,15 @@ class UserManager(BaseUserManager):
         return self.create_user(username, password, **extra_fields)
 
 
+ROLE_ADMIN = "admin"
+
+
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('student', 'Студент'),
         ('mentor', 'Ментор'),
         ('scheduler', 'Составитель расписания'),
+        (ROLE_ADMIN, 'Админ'),
     )
 
     email = models.EmailField(_("Адрес электронной почты"), blank=True)
@@ -79,7 +83,8 @@ class User(AbstractUser):
         max_length=20,
         blank=True,
         null=True,
-        verbose_name='Пароль (открытый)'
+        verbose_name='Пароль (открытый)',
+        help_text='Если изменится пароль, то этот будет не действителен'
     )
 
     mentor_achievements = models.TextField(verbose_name='Достижения ментора', blank=True, null=True)
@@ -117,8 +122,7 @@ class User(AbstractUser):
         null=True,
         verbose_name=_("Группа")
     )
-    organization = models.ForeignKey('academics.Organization', on_delete=models.SET_NULL, null=True,
-                                     verbose_name='Учебное заведение')
+    organization = models.ForeignKey('academics.Organization', on_delete=models.CASCADE, verbose_name='Учебное заведение')
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []

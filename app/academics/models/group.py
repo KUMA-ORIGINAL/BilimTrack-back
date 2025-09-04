@@ -8,16 +8,9 @@ User = get_user_model()
 
 class Group(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name='Название группы')
-    rules = models.JSONField(blank=True, null=True, help_text="Правила для группы", verbose_name='Правила')
-    contract = ProcessedImageField(upload_to='contracts/%Y',
-                                   processors=[ResizeToFill(500, 500)],
-                                   format='JPEG',
-                                   options={'quality': 60},
-                                   blank=True,
-                                   verbose_name='Контракт')
     points = models.PositiveIntegerField(default=0, blank=True, verbose_name='Очки')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
-    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='groups', verbose_name='Курс', blank=True, null=True)
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='groups', verbose_name='Курс')
     curator = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -30,7 +23,7 @@ class Group(models.Model):
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE,
                                      verbose_name='Учебное заведение')
     education_level = models.ForeignKey(
-        'academics.EducationLevel',
+        'EducationLevel',
         on_delete=models.SET_NULL,
         null=True, blank=True,
         verbose_name='Уровень образования',

@@ -8,10 +8,16 @@ from unfold.contrib.filters.admin import RelatedDropdownFilter
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.forms import UserChangeForm, UserCreationForm, AdminPasswordChangeForm
 
-from ..models import User, WorkExperience, Education
+from common.admin import BaseModelAdmin
+from ..models import User, WorkExperience, Education, ROLE_ADMIN
 from ..resources import UserResource, MentorResource
 
 admin.site.unregister(Group)
+
+
+@admin.register(Group)
+class GroupAdmin(GroupAdmin, UnfoldModelAdmin):
+    pass
 
 
 class WorkExperienceInline(StackedInline):  # или admin.StackedInline
@@ -25,7 +31,7 @@ class EducationInline(StackedInline):  # или admin.StackedInline
 
 
 @admin.register(User)
-class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
+class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
     resource_classes = [UserResource, MentorResource]
@@ -38,47 +44,15 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
 
     ordering = ['date_joined']
 
-    list_display = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'group', 'points', 'rating')
     list_display_links = ('id', 'username')
     list_filter = ('role',  ("group", RelatedDropdownFilter),
-                   'is_active', 'is_staff', 'is_superuser')
+                   'is_active', 'is_staff', 'is_superuser', 'organization')
     list_filter_submit = True
-    autocomplete_fields = ('achievements', 'tools', 'skills',)
+    autocomplete_fields = ('achievements', 'tools', 'skills', 'groups', 'group')
     inlines = [WorkExperienceInline, EducationInline]
     list_per_page = 20
+    readonly_fields = ('date_joined', 'last_login')
 
-    fieldsets = (
-        (None, {"fields": ("username", "password", 'plain_password')}),
-        (
-            "Permissions",
-            {
-                "fields": (
-                    "is_staff",
-                    "is_active",
-                    "is_superuser",
-                    "groups",
-                    # "user_permissions",
-                )
-            },
-        ),
-        ("Dates", {"fields": ("last_login", "date_joined")}),
-        ("Общее", {"fields": ('email', 'first_name', 'last_name', 'patronymic', 'role', 'photo', 'organization')}),
-        ('Для студента', {
-            'fields': ('group', 'achievements_count',
-                       'points', 'rating', 'achievements')}),
-        ('Для ментора', {
-            'fields': (
-                'phone_number',
-                'skills',  # Навыки
-                'tools',  # Инструменты
-                'mentor_achievements',  # Достижения ментора
-                'instagram',  # Instagram
-                'telegram',  # Telegram
-                'whatsapp',  # Whatsapp
-                'facebook',  # Facebook
-            )
-        }),
-    )
     add_fieldsets = (
         (
             None,
@@ -93,7 +67,93 @@ class UserAdmin(UserAdmin, UnfoldModelAdmin, ImportExportModelAdmin):
         ),
     )
 
+    def get_readonly_fields(self, request, obj=None, **kwargs):
+        readonly_fields = ('points', 'rating', 'achievements_count')
+        if request.user.is_superuser:
+            return ()
+        elif request.user.role == ROLE_ADMIN:
+            return readonly_fields
+        return readonly_fields
 
-@admin.register(Group)
-class GroupAdmin(GroupAdmin, UnfoldModelAdmin):
-    pass
+    def get_list_display(self, request, obj=None, **kwargs):
+        list_display = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'group', 'points', 'rating', 'organization', 'detail_link')
+        if request.user.is_superuser:
+            return list_display
+        elif request.user.role == ROLE_ADMIN:
+            return ('username', 'email', 'first_name', 'last_name', 'role', 'group', 'points', 'rating', 'detail_link')
+        return list_display
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        elif request.user.role == ROLE_ADMIN:
+            return qs.filter(organization=request.user.organization)
+        return qs.none()
+
+    def get_fieldsets(self, request, obj=None):
+        if not obj:
+            return self.add_fieldsets
+
+        fieldsets = [
+            (None, {"fields": ("username", "password", "plain_password")}),
+            (
+                "Permissions",
+                {
+                    "fields": (
+                        "is_staff",
+                        "is_active",
+                        "is_superuser",
+                        "groups",
+                    )
+                },
+            ),
+            ("Dates", {"fields": ("last_login", "date_joined")}),
+            (
+                "Общее",
+                {
+                    "fields": (
+                        "email",
+                        "first_name",
+                        "last_name",
+                        "patronymic",
+                        "role",
+                        "photo",
+                        "organization",
+                    )
+                },
+            ),
+            ("Для студента", {"fields": ("group", "achievements_count", "points", "rating",)}),
+            (
+                "Для ментора",
+                {
+                    "fields": (
+                        "phone_number",
+                        "skills",
+                        "tools",
+                        "mentor_achievements",
+                        "instagram",
+                        "telegram",
+                        "whatsapp",
+                        "facebook",
+                    )
+                },
+            ),
+        ]
+        if request.user.is_superuser:
+            return fieldsets
+        elif request.user.role == ROLE_ADMIN:
+            fieldsets = [fs for fs in fieldsets if fs[0] != "Permissions"]
+            new_fieldsets = []
+            for name, opts in fieldsets:
+                if name == "Общее":
+                    opts = opts.copy()
+                    opts["fields"] = tuple(f for f in opts["fields"] if f != "organization")
+                new_fieldsets.append((name, opts))
+            fieldsets = new_fieldsets
+        return fieldsets
+
+    def save_model(self, request, obj, form, change):
+        if request.user.role == ROLE_ADMIN and not change:
+            obj.organization_id = request.user.organization_id
+        super().save_model(request, obj, form, change)

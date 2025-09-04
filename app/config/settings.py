@@ -297,6 +297,13 @@ DJOSER = {
     # },
 }
 
+ROLE_CHOICES = (
+    ('student', _("Студент")),
+    ('mentor', _("Ментор")),
+    ('scheduler', _("Составитель расписания")),
+    ('admin', _("Админ")),
+)
+
 UNFOLD = {
     "SITE_TITLE": 'BilimTrack',
     "SITE_HEADER": "BilimTrack",
@@ -341,6 +348,34 @@ UNFOLD = {
             "important-dark": "var(--color-base-100)",  # text-base-100
         },
     },
+    'TABS': [
+        {
+            "page": "user",
+            "models": ["account.user"],
+            "items": [
+                {
+                    "title": _("Все пользователи"),
+                    "link": reverse_lazy("admin:account_user_changelist"),
+                    "active": lambda request: (
+                        request.path == reverse_lazy("admin:account_user_changelist")
+                        and "role__exact" not in request.GET
+                    ),
+                },
+                *[
+                    {
+                        "title": label,  # читаемое имя роли
+                        "link": (lambda role:
+                            (lambda request: f"{reverse_lazy('admin:account_user_changelist')}?role__exact={role}")
+                        )(role),
+                        "active": (lambda role:
+                            (lambda request: request.GET.get("role__exact") == role)
+                        )(role),
+                    }
+                    for role, label in ROLE_CHOICES
+                ],
+            ],
+        }
+    ],
     "SIDEBAR": {
         "show_search": False,  # Search in applications and models names
         "show_all_applications": False,  # Dropdown with all applications and models
@@ -392,6 +427,7 @@ UNFOLD = {
                         "title": _("Темы уроков"),
                         "icon": "topic",
                         "link": reverse_lazy("admin:academics_lessontopic_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
                     },
                 ]
             },
@@ -402,11 +438,13 @@ UNFOLD = {
                         "title": _("Список платежей"),
                         "icon": "payment",
                         "link": reverse_lazy("admin:academics_payment_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
                     },
                     {
                         "title": _("Платёжные токены организаций"),
                         "icon": "key",
                         "link": reverse_lazy("admin:academics_paymenttoken_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
                     },
                 ],
             },
@@ -437,6 +475,7 @@ UNFOLD = {
                         "title": _("Типы занятий"),
                         "icon": "category",
                         "link": reverse_lazy("admin:schedule_lessontype_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
                     },
                     {
                         "title": _("Занятия"),
@@ -477,16 +516,19 @@ UNFOLD = {
                         "title": _("Технологии"),
                         "icon": "home_repair_service",
                         "link": reverse_lazy("admin:account_tool_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
                     },
                     {
                         "title": _("Навыки"),
                         "icon": "psychology",
                         "link": reverse_lazy("admin:account_skill_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
                     },
                     {
                         "title": _("Группы"),
                         "icon": "group",
                         "link": reverse_lazy("admin:auth_group_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
                     },
                 ],
             },

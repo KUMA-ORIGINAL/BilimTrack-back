@@ -12,12 +12,6 @@ class GroupSubjectMentor(models.Model):
         verbose_name='Наставник',
         limit_choices_to={'role': 'mentor'}
     )
-    subjects = models.ManyToManyField(
-        'Subject',
-        through='GroupSubjectMentorSubject',
-        related_name='group_subjects',
-        verbose_name='Предметы'
-    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлено')
 
@@ -32,7 +26,7 @@ class GroupSubjectMentor(models.Model):
 
 class GroupSubjectMentorSubject(models.Model):
     group_subject_mentor = models.ForeignKey(GroupSubjectMentor, on_delete=models.CASCADE)
-    subject = models.ForeignKey('Subject', on_delete=models.CASCADE)
+    subject = models.ForeignKey('Subject', on_delete=models.CASCADE, verbose_name='Предмет')
 
     class Meta:
         unique_together = ('group_subject_mentor', 'subject')

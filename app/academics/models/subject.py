@@ -19,7 +19,6 @@ class Subject(models.Model):
         on_delete=models.CASCADE,
         related_name='subjects',
         verbose_name='Семестр',
-        null=True,
     )
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, verbose_name='Учебное заведение')
     education_level = models.ForeignKey(

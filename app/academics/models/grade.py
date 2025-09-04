@@ -19,8 +19,8 @@ class Grade(models.Model):
         (10, 'Оценка 10'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Студент')
-    session = models.ForeignKey('Session', on_delete=models.CASCADE, verbose_name='Занятие', null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Студент', limit_choices_to={'role': 'student'})
+    session = models.ForeignKey('Session', on_delete=models.CASCADE, verbose_name='Занятие')
     grade = models.IntegerField(choices=GRADE_CHOICES, verbose_name='Оценка')
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
     make_up_link = models.URLField(blank=True, null=True, verbose_name='Ссылка на отработку')

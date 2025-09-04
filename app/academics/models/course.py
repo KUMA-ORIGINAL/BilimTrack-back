@@ -6,8 +6,6 @@ class Course(models.Model):
     organization = models.ForeignKey(
         'Organization',
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
         verbose_name='Учебное заведение'
     )
     education_level = models.ForeignKey(

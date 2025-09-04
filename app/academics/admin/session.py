@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from unfold.decorators import display, action
 
+from account.models import ROLE_ADMIN
 from common.admin import BaseModelAdmin
 from ..models import Session
 from ..services.sessions import generate_sessions_for_date
@@ -15,9 +16,9 @@ class SessionAdmin(BaseModelAdmin):
     list_display = ('id', 'subject', 'date', 'display_time', 'is_active', 'detail_link')
     list_display_links = ('id', 'subject')
     search_fields = ('subject__name',)
-    list_filter = ('subject', 'is_active', 'date')
+    list_filter = ('subject', 'is_active', 'date', 'teacher__organization')
     date_hierarchy = 'date'
-    autocomplete_fields = ('groups',)
+    autocomplete_fields = ('groups', 'teacher', 'subject', 'topic', 'room')
 
     # --- красивый вывод времени
     @display(description=_("Время занятия"))
@@ -68,3 +69,11 @@ class SessionAdmin(BaseModelAdmin):
 
     def has_generate_tomorrow_sessions_permission(self, request):
         return self.has_generate_today_sessions_permission(request)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        elif request.user.role == ROLE_ADMIN:
+            return qs.filter(teacher__organization_id=request.user.organization_id)
+        return qs.none()

@@ -3,6 +3,7 @@ from django.contrib import admin
 from unfold.contrib.filters.admin import RelatedDropdownFilter
 
 from academics.models import Grade
+from account.models import ROLE_ADMIN
 from common.admin import BaseModelAdmin
 
 
@@ -17,6 +18,7 @@ class GradeAdmin(BaseModelAdmin):
         'grade',
         'created_at',
     )
+    autocomplete_fields = ('user', 'session')
     list_filter_submit = True
     list_per_page = 50
 
@@ -29,3 +31,11 @@ class GradeAdmin(BaseModelAdmin):
             'classes': ('collapse',),  # сворачиваемая секция
         }),
     )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        elif request.user.role == ROLE_ADMIN:
+            return qs.filter(user__organization_id=request.user.organization_id)
+        return qs.none()

@@ -22,7 +22,6 @@ class Schedule(models.Model):
     organization = models.ForeignKey(
         'academics.Organization',
         on_delete=models.CASCADE,
-        null=True, blank=True,
         verbose_name='Учебное заведение'
     )
     education_level = models.ForeignKey(

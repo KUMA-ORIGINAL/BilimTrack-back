@@ -1,10 +1,10 @@
 from django.contrib import admin
-from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
+from common.admin import BaseModelAdmin
 from ..models import LessonType
 
 
 @admin.register(LessonType)
-class LessonTypeAdmin(UnfoldModelAdmin):
-    list_display = ('id', 'name')
+class LessonTypeAdmin(BaseModelAdmin):
+    list_display = ('id', 'name', 'detail_link')
     list_display_links = ('id', 'name')
