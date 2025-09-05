@@ -389,11 +389,6 @@ UNFOLD = {
                         "link": reverse_lazy("admin:academics_organization_changelist"),
                     },
                     {
-                        "title": _("Оценки"),
-                        "icon": "stars",
-                        "link": reverse_lazy("admin:academics_grade_changelist"),
-                    },
-                    {
                         "title": _("Курсы"),
                         "icon": "school",
                         "link": reverse_lazy("admin:academics_course_changelist"),
@@ -418,6 +413,16 @@ UNFOLD = {
                         "icon": "groups",
                         "link": reverse_lazy("admin:academics_groupsubjectmentor_changelist"),
                     },
+                ]
+            },
+            {
+                "title": _("Журнал"),
+                "items": [
+                    {
+                        "title": _("Оценки"),
+                        "icon": "stars",
+                        "link": reverse_lazy("admin:academics_grade_changelist"),
+                    },
                     {
                         "title": _("Занятия"),
                         "icon": "event",
@@ -433,6 +438,7 @@ UNFOLD = {
             },
             {
                 "title": _("Платежи"),
+                "collapsible": True,
                 "items": [
                     {
                         "title": _("Список платежей"),

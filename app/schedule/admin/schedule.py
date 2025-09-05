@@ -45,11 +45,11 @@ class ScheduleAdmin(BaseModelAdmin):
         base = (
             'id', 'get_groups', 'subject', 'teacher',
             'day_of_week', 'week_type', 'lesson_time', 'lesson_type', 'room',
-            'education_level', 'detail_link'
+            'education_level',
         )
         if request.user.is_superuser:
-            return base + ('organization',)
-        return base
+            base = base + ('organization',)
+        return base + ('detail_link',)
 
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)

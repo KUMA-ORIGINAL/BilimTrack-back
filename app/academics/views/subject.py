@@ -21,16 +21,23 @@ class SubjectViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     @action(detail=False, methods=['get'], url_path='me', url_name='me')
     def me(self, request):
         """
-        для студента
+        Получить список предметов для текущего студента
         """
         user = request.user
-        group = user.group
+        group = getattr(user, "group", None)  # предполагается, что у User есть поле group
         if not group:
-            return Response({"detail": "User is not assigned to any group."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        subjects = group.subjects.all()
-        subjects_serializer = self.get_serializer(subjects, many=True)
-        return Response(subjects_serializer.data)
+            return Response(
+                {"detail": "Пользователь не состоит ни в одной группе."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Найдём все предметы для этой группы через «наставник–группа–предмет»
+        subjects = Subject.objects.filter(
+            mentor_links__group=group  # mentor_links мы добавляли в GroupSubjectMentor через ManyToMany
+        ).distinct()
+
+        serializer = self.get_serializer(subjects, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema(tags=['Subject Mentor'])

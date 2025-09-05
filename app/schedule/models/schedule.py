@@ -62,9 +62,8 @@ class Schedule(models.Model):
     )
     lesson_type = models.ForeignKey(
         'LessonType',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         verbose_name='Тип занятия',
-        blank=True,
         null=True
     )
     week_type = models.CharField(
