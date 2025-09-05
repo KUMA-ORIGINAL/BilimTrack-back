@@ -31,7 +31,9 @@ class Session(models.Model):
     room = models.ForeignKey(
         'schedule.Room',
         on_delete=models.CASCADE,
-        verbose_name="Аудитория"
+        verbose_name="Аудитория",
+        blank=True,
+        null=True
     )
 
     date = models.DateField(verbose_name='Дата занятия')
