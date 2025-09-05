@@ -87,6 +87,12 @@ class User(AbstractUser):
         help_text='Если изменится пароль, то этот будет не действителен'
     )
 
+    google_meet_link = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name="Ссылка на Google Meet"
+    )
     mentor_achievements = models.TextField(verbose_name='Достижения ментора', blank=True, null=True)
 
     instagram = models.URLField("Instagram", max_length=255, blank=True, null=True)

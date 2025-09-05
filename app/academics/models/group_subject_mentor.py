@@ -12,6 +12,12 @@ class GroupSubjectMentor(models.Model):
         verbose_name='Наставник',
         limit_choices_to={'role': 'mentor'}
     )
+    subjects = models.ManyToManyField(
+        'Subject',
+        through='GroupSubjectMentorSubject',
+        related_name='mentor_links',
+        verbose_name='Предметы'
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлено')
 

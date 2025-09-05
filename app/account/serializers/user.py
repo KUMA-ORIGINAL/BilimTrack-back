@@ -46,6 +46,7 @@ class MeSerializer(serializers.ModelSerializer):
                 'email',
                 'phone_number',
                 'photo',
+                'google_meet_link',
                 'organization',
                 'skills',
                 'mentor_achievements',
@@ -95,6 +96,7 @@ class MeUpdateSerializer(serializers.ModelSerializer):
             'email',
             'phone_number',
             'photo',
+            'google_meet_link',
             'skills',
             'mentor_achievements',
             'instagram',
@@ -130,7 +132,6 @@ class MeUpdateSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
-
 
 
 class UserListSerializer(serializers.ModelSerializer):

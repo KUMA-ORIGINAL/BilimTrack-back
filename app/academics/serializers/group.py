@@ -9,7 +9,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Group
-        fields = ['id', 'name', 'rules', 'contract', 'created_at', 'subjects']
+        fields = ['id', 'name', 'created_at', 'subjects']
 
 
 class GroupListSerializer(serializers.ModelSerializer):

@@ -53,23 +53,6 @@ class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
     list_per_page = 20
     readonly_fields = ('date_joined', 'last_login')
 
-    add_fieldsets = (
-        (
-            None,
-            {
-                "classes": ("wide",),
-                "fields": (
-                    "username",
-                    "password1",
-                    "password2",
-                    'organization',
-                    'role',
-                    'groups',
-                    'is_staff',
-                ),
-            },
-        ),
-    )
 
     def get_readonly_fields(self, request, obj=None, **kwargs):
         readonly_fields = ('points', 'rating', 'achievements_count')
@@ -96,8 +79,41 @@ class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
         return qs.none()
 
     def get_fieldsets(self, request, obj=None):
+        add_fieldsets = (
+            (
+                None,
+                {
+                    "classes": ("wide",),
+                    "fields": (
+                        "username",
+                        "password1",
+                        "password2",
+                        'organization',
+                        'role',
+                    ),
+                },
+            ),
+        )
+
         if not obj:
-            return self.add_fieldsets
+            if request.user.is_superuser:
+                return add_fieldsets
+            elif request.user.role == ROLE_ADMIN:
+                add_fieldsets = (
+                    (
+                        None,
+                        {
+                            "classes": ("wide",),
+                            "fields": (
+                                "username",
+                                "password1",
+                                "password2",
+                                'role',
+                            ),
+                        },
+                    ),
+                )
+                return add_fieldsets
 
         fieldsets = [
             (None, {"fields": ("username", "password", "plain_password")}),
@@ -133,6 +149,7 @@ class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
                 {
                     "fields": (
                         "phone_number",
+                        'google_meet_link',
                         "skills",
                         "tools",
                         "mentor_achievements",
