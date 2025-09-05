@@ -36,7 +36,7 @@ class GroupViewSet(viewsets.GenericViewSet):
     def mentor_me(self, request):
         subject_id = request.query_params.get('subject_id')
         if not subject_id:
-            return Response({"detail": "Subject ID is required."},
+            return Response({"detail": "SubjectId is required."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         try:
