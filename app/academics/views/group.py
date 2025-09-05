@@ -32,30 +32,22 @@ class GroupViewSet(viewsets.GenericViewSet):
             return GroupSerializer
         return MentorGroupSerializer
 
-    @action(detail=False, methods=['get'], url_path='me', url_name='me')
-    def me(self, request):
-        user = request.user
-        group = user.group
-        if not group:
-            return Response({"detail": "User is not assigned to any group."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        group_serializer = self.get_serializer(group)
-        return Response(group_serializer.data)
-
-    @action(detail=False, methods=['get'], url_path='mentor/me', url_name='me')
+    @action(detail=False, methods=['get'], url_path='mentor/me', url_name='mentor-me')
     def mentor_me(self, request):
-        subject_id = request.query_params.get('subject_id')
+        subject_id = request.query_params.get('subjectId')
         if not subject_id:
             return Response({"detail": "Subject ID is required."},
                             status=status.HTTP_400_BAD_REQUEST)
+
         try:
             subject = Subject.objects.get(id=subject_id)
         except Subject.DoesNotExist:
             return Response({"detail": "Subject not found."},
                             status=status.HTTP_404_NOT_FOUND)
 
+        # ⚡ правильная фильтрация через ManyToMany 'subjects'
         group_ids = GroupSubjectMentor.objects.filter(
-            subject=subject,
+            subjects=subject,
             mentor=request.user
         ).values_list('group_id', flat=True)
 
@@ -65,5 +57,5 @@ class GroupViewSet(viewsets.GenericViewSet):
             return Response({"detail": "You are not a mentor in any group for this subject."},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        group_serializer = self.get_serializer(groups, many=True)
-        return Response(group_serializer.data)
+        serializer = GroupSerializer(groups, many=True)
+        return Response(serializer.data)
