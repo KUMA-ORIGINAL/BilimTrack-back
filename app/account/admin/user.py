@@ -22,12 +22,12 @@ class GroupAdmin(GroupAdmin, UnfoldModelAdmin):
 
 class WorkExperienceInline(StackedInline):  # или admin.StackedInline
     model = WorkExperience
-    extra = 1  # сколько пустых форм для добавления
+    extra = 0  # сколько пустых форм для добавления
 
 
 class EducationInline(StackedInline):  # или admin.StackedInline
     model = Education
-    extra = 1  # сколько пустых форм для добавления
+    extra = 0  # сколько пустых форм для добавления
 
 
 @admin.register(User)
@@ -45,14 +45,21 @@ class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
     ordering = ['date_joined']
 
     list_display_links = ('id', 'username')
-    list_filter = ('role',  ("group", RelatedDropdownFilter),
-                   'is_active', 'is_staff', 'is_superuser', 'organization')
     list_filter_submit = True
     autocomplete_fields = ('achievements', 'tools', 'skills', 'groups', 'group')
     inlines = [WorkExperienceInline, EducationInline]
     list_per_page = 20
     readonly_fields = ('date_joined', 'last_login')
+    list_select_related = ('organization', 'group')
 
+    def get_list_filter(self, request):
+        list_filter = ('role', ("group", RelatedDropdownFilter),
+                       'is_active', 'is_staff',)
+        if request.user.is_superuser:
+            return list_filter + ('is_superuser', 'organization',)
+        elif request.user.role == ROLE_ADMIN:
+            return list_filter
+        return list_filter
 
     def get_readonly_fields(self, request, obj=None, **kwargs):
         readonly_fields = ('points', 'rating', 'achievements_count')

@@ -143,6 +143,11 @@ class User(AbstractUser):
         ordering = ('-date_joined',)
         verbose_name = _("Пользователь")
         verbose_name_plural = _("Пользователи")
+        indexes = [
+            models.Index(fields=['role']),  # фильтр только по роли
+            models.Index(fields=['organization']),  # фильтр только по организации
+            models.Index(fields=['organization', 'role']),  # фильтр по организации + роли
+        ]
 
     def __str__(self):
         return f'{self.username} - {self.full_name}'
