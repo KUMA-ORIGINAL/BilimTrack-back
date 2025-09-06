@@ -10,6 +10,7 @@ class CourseAdmin(BaseModelAdmin):
     list_display = ('id', 'number', 'organization', 'education_level', 'detail_link')
     list_filter = ('organization', 'education_level')
     search_fields = ('number',)
+    list_select_related = ('organization', 'education_level')
 
     def get_list_display(self, request):
         list_display = ('id', 'number', 'organization', 'education_level', 'detail_link')

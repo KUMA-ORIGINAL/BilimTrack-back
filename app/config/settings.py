@@ -218,10 +218,25 @@ LOGGING = {
     }
 }
 
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
+    'SHOW_COLLAPSED': True,
+    'ENABLE_STACKTRACES': False,
+    'DISABLE_PANELS': {
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+        'cachalot.panels.CachalotPanel',
+    },
+}
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+    'localhost',
+]
 
 if DEBUG:
-    INSTALLED_APPS += ['silk']
+    INSTALLED_APPS += ['silk', "debug_toolbar",]
     MIDDLEWARE.insert(0, 'silk.middleware.SilkyMiddleware')
+    MIDDLEWARE.insert(1, 'debug_toolbar.middleware.DebugToolbarMiddleware', )
 
 CACHALOT_ENABLED = True
 CACHALOT_ONLY_CACHABLE_TABLES = (
@@ -232,8 +247,17 @@ CACHALOT_ONLY_CACHABLE_TABLES = (
     'account_tool',
 
     'academics_group',
+    'academics_course',
+    'academics_semester',
+    'academics_organization',
+    'academics_educationlevel',
     'academics_subject',
     'academics_grade',
+
+    'schedule_schedule',
+    'schedule_room',
+    'schedule_lessontime',
+    'schedule_lessontype',
 )
 CACHALOT_TIMEOUT = 60 * 30
 

@@ -24,6 +24,7 @@ class ScheduleAdmin(BaseModelAdmin):
     )
     autocomplete_fields = ('groups', 'subject', 'teacher', 'room', 'lesson_time')
 
+
     @admin.display(description='Группы')
     def get_groups(self, obj):
         return ", ".join([str(g) for g in obj.groups.all()])
@@ -65,7 +66,7 @@ class ScheduleAdmin(BaseModelAdmin):
         super().save_model(request, obj, form, change)
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
+        qs = super().get_queryset(request).prefetch_related('groups')
         if request.user.is_superuser:
             return qs
         elif request.user.role == ROLE_ADMIN:

@@ -12,6 +12,7 @@ class GroupAdmin(BaseModelAdmin):
     list_filter = ('organization', 'education_level')
     search_fields = ('name',)
     autocomplete_fields = ('course', 'curator')
+    list_select_related = ('organization', 'education_level')
 
     def get_readonly_fields(self, request, obj=None):
         if request.user.role == ROLE_ADMIN:

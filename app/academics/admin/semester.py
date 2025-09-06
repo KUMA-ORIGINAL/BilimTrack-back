@@ -14,10 +14,7 @@ class SemesterAdmin(BaseModelAdmin):
     search_fields = ('course__organization__name', 'course__education_level__name')
     list_filter = ('course__organization', 'course__education_level', 'course')
     autocomplete_fields = ('course',)
-
-    @display(description=_("Курс"))
-    def display_course(self, obj):
-        return f"{obj.course.number} курс ({obj.course.education_level})"
+    list_select_related = ('course',)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
