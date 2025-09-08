@@ -22,7 +22,7 @@ class GroupAdmin(BaseModelAdmin):
     def get_list_display(self, request):
         list_display = ('id', 'name', 'points', 'organization', 'education_level', 'detail_link')
         if request.user.role == ROLE_ADMIN:
-            list_display = ('name', 'points', 'education_level', 'detail_link')
+            list_display = ('id', 'name', 'points', 'education_level', 'detail_link')
         return list_display
 
     def get_fields(self, request, obj=None):
