@@ -3,62 +3,128 @@ import logging
 from unidecode import unidecode
 
 from django.utils.text import slugify
-from import_export import resources, fields
+from import_export import resources
 
-from academics.models import Organization
 from .models import User
 
 logger = logging.getLogger(__name__)
 
 
-class UserResource(resources.ModelResource):
+class StudentResource(resources.ModelResource):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Загружаем все данные студентов с отчеством и организацией
+        users = User.objects.values_list(
+            "first_name", "last_name", "patronymic", "group_id", "username", "organization_id"
+        )
+
+        # Ключ учитывает ФИО + group_id + org_id
+        self.existing_students = {
+            (fn.strip().lower(), ln.strip().lower(), (pn or "").strip().lower(), gid, org)
+            for fn, ln, pn, gid, u, org in users
+        }
+
+        self.existing_usernames = {u for _, _, _, _, u, _ in users}
 
     class Meta:
         model = User
-        exclude = ('id',)
+        exclude = ("id",)
         import_id_fields = ()
-        fields = ('first_name', 'last_name', 'role', 'group', 'username', 'plain_password')
+        use_bulk = True
+        fields = (
+            "first_name",
+            "last_name",
+            "patronymic",   # 🔑 добавлено
+            "group",
+            "username",
+            "plain_password",
+        )
 
     def before_import_row(self, row, **kwargs):
-        first_name = row.get('first_name', '').strip()
-        last_name = row.get('last_name', '').strip()
-        group_id = row.get('group')
+        first_name = row.get("first_name", "").strip()
+        last_name = row.get("last_name", "").strip()
+        patronymic = (row.get("patronymic") or "").strip()
+        group_id = row.get("group")
 
-        logger.info(f"📥 Импортируем: {first_name} {last_name}, группа: {group_id}")
+        # Берем organization из request
+        request = kwargs.get("request")
+        organization_id = None
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            if hasattr(request.user, "organization_id"):
+                organization_id = request.user.organization_id
 
-        if User.objects.filter(first_name=first_name, last_name=last_name, group_id=group_id).exists():
-            logger.warning(f"⚠️ Пропущен: {first_name} {last_name} уже существует в группе {group_id}")
-            raise Exception(f"Пользователь {first_name} {last_name} уже существует в группе {group_id}")
+        logger.info(
+            f"📥 Импортируем студента: {last_name} {first_name} {patronymic}, "
+            f"group={group_id}, org={organization_id}"
+        )
 
+        # --- Проверка дублей с учетом отчества и organization
+        key = (
+            first_name.lower(),
+            last_name.lower(),
+            patronymic.lower(),
+            int(group_id) if group_id else None,
+            int(organization_id) if organization_id else None,
+        )
+        if key in self.existing_students:
+            logger.warning(
+                f"⚠️ Пропущен: {first_name} {patronymic} {last_name} уже существует "
+                f"в группе {group_id}, org={organization_id}"
+            )
+            raise Exception(
+                f"Студент {first_name} {patronymic} {last_name} уже существует "
+                f"в группе {group_id}, org={organization_id}"
+            )
+
+        # --- Генерация username (только Фамилия + первая буква Имени, отчество можно не брать)
         try:
-            transliterated = unidecode(f"{last_name}{first_name[0]}")  # ИвановИ → IvanovI
+            transliterated = unidecode(f"{last_name}{first_name[0]}")  # ИвановИ → ivanovi
             base_username = slugify(transliterated).lower()
         except Exception as e:
             logger.error(f"❌ Ошибка при генерации username: {e}")
             raise
 
         if not base_username:
-            logger.error("❌ slugify вернул пустую строку — проверь имя/фамилию")
-            raise Exception(f"Невозможно сгенерировать username из: {last_name} {first_name}")
+            raise Exception(
+                f"Невозможно сгенерировать username из: {last_name} {first_name}"
+            )
 
         username = base_username
+        counter = 1
+        while username in self.existing_usernames:
+            username = f"{base_username}{counter}"
+            counter += 1
 
+        # --- Генерация PIN
         pin = str(random.randint(0, 9999)).zfill(4)
+        logger.info(f"✅ Сгенерирован логин={username}, PIN={pin}")
 
-        logger.info(f"✅ Сгенерирован логин: {username}, PIN: {pin}")
+        # Записываем данные в row
+        row["username"] = username
+        row["plain_password"] = pin
+        row["_raw_password"] = pin
+        row["role"] = "student"
+        row["organization"] = organization_id
 
-        row['username'] = username
-        row['plain_password'] = pin
-        row['_raw_password'] = pin  # временно для set_password
+        # Пополняем кэши
+        self.existing_students.add(key)
+        self.existing_usernames.add(username)
 
     def before_save_instance(self, instance, row, **kwargs):
-        raw_password = row.get('_raw_password')
+        raw_password = row.get("_raw_password")
         if raw_password:
             instance.set_password(raw_password)
             instance.plain_password = raw_password
 
+        # Присваиваем организацию из request
+        request = kwargs.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            if hasattr(request.user, "organization"):
+                instance.organization = request.user.organization
+
     def dehydrate_group(self, instance):
-        return instance.group.name if instance.group else ''
+        return instance.group.name if instance.group else ""
 
 
 class MentorResource(resources.ModelResource):

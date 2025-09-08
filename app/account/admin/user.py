@@ -10,7 +10,7 @@ from unfold.forms import UserChangeForm, UserCreationForm, AdminPasswordChangeFo
 
 from common.admin import BaseModelAdmin
 from ..models import User, WorkExperience, Education, ROLE_ADMIN
-from ..resources import UserResource, MentorResource
+from ..resources import StudentResource, MentorResource
 
 admin.site.unregister(Group)
 
@@ -34,7 +34,7 @@ class EducationInline(StackedInline):  # или admin.StackedInline
 class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = ExportForm
-    resource_classes = [UserResource, MentorResource]
+    resource_classes = [StudentResource, MentorResource]
 
     form = UserChangeForm
     add_form = UserCreationForm
