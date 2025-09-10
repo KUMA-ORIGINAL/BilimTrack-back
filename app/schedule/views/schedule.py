@@ -1,9 +1,13 @@
+from django.db.models import Min, Max
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, filters, mixins
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from schedule.models import Schedule
-from schedule.serializers import ScheduleCreateUpdateSerializer, ScheduleSerializer
+from schedule.serializers import ScheduleCreateUpdateSerializer, ScheduleSerializer, MentorScheduleSerializer
 
 
 @extend_schema(tags=['schedule'])
@@ -41,3 +45,41 @@ class ScheduleViewSet(viewsets.GenericViewSet,
 
     def perform_create(self, serializer):
         serializer.save(organization=self.request.user.organization)
+
+
+@extend_schema(tags=['schedule'])
+class MentorScheduleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        mentor = request.user
+        qs = Schedule.objects.filter(teacher=mentor).select_related("lesson_time", "room", "subject")
+
+        serializer = MentorScheduleSerializer(qs, many=True)
+
+        total_classes = qs.count()
+        total_minutes = sum(
+            (s.lesson_time.end_time.hour * 60 + s.lesson_time.end_time.minute) -
+            (s.lesson_time.start_time.hour * 60 + s.lesson_time.start_time.minute)
+            for s in qs
+        )
+        total_hours = round(total_minutes / 60, 1)
+
+        start_time = qs.aggregate(start=Min("lesson_time__start_time"))["start"]
+        end_time = qs.aggregate(end=Max("lesson_time__end_time"))["end"]
+
+        return Response({
+            "stats": {
+                "total_classes": total_classes,
+                "total_hours": total_hours,
+                "start_time": start_time.strftime("%H:%M") if start_time else None,
+                "end_time": end_time.strftime("%H:%M") if end_time else None,
+            },
+            "days": self.group_by_day(serializer.data)
+        })
+
+    def group_by_day(self, lessons):
+        days = {str(d): [] for d in range(7)}  # 0..6
+        for lesson in lessons:
+            days[str(lesson["day_of_week"])].append(lesson)
+        return days

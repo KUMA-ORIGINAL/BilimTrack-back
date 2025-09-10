@@ -16,4 +16,5 @@ router.register('', views.ScheduleViewSet, basename='schedule')
 
 urlpatterns = [
     path('schedules/', include(router.urls)),
+    path("mentor/schedule/", views.MentorScheduleView.as_view(), name="mentor-schedule"),
 ]

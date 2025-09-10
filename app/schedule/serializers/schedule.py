@@ -105,3 +105,31 @@ class ScheduleCreateUpdateSerializer(serializers.ModelSerializer):
             'day_of_week',
             "week_type",
         ]
+
+
+class MentorScheduleSerializer(serializers.ModelSerializer):
+    subject = SubjectSerializer(read_only=True)
+    room = RoomSerializer(read_only=True)
+    lesson_time = LessonTimeSerializer(read_only=True)
+    lesson_type = LessonTypeSerializer(read_only=True)
+    day_name = serializers.CharField(source="get_day_of_week_display", read_only=True)
+
+    duration_minutes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Schedule
+        fields = [
+            "id",
+            "subject",
+            "room",
+            "lesson_type",
+            "day_of_week",
+            "day_name",
+            "lesson_time",
+            "duration_minutes",
+        ]
+
+    def get_duration_minutes(self, obj):
+        start = obj.lesson_time.start_time
+        end = obj.lesson_time.end_time
+        return (end.hour * 60 + end.minute) - (start.hour * 60 + start.minute)
