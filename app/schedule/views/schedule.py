@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db.models import Min, Max
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
@@ -53,7 +55,11 @@ class MentorScheduleView(APIView):
 
     def get(self, request):
         mentor = request.user
-        qs = Schedule.objects.filter(teacher=mentor).select_related("lesson_time", "room", "subject")
+
+        # Получаем все пары текущего ментора
+        qs = Schedule.objects.filter(teacher=mentor).select_related(
+            "lesson_time", "room", "subject"
+        )
 
         serializer = MentorScheduleSerializer(qs, many=True)
 
@@ -65,21 +71,25 @@ class MentorScheduleView(APIView):
         )
         total_hours = round(total_minutes / 60, 1)
 
-        start_time = qs.aggregate(start=Min("lesson_time__start_time"))["start"]
-        end_time = qs.aggregate(end=Max("lesson_time__end_time"))["end"]
+        # ---- Время за сегодня ----
+        today = date.today().weekday()  # 0 = понедельник
+        today_qs = qs.filter(day_of_week=today)
+
+        day_start = today_qs.aggregate(start=Min("lesson_time__start_time"))["start"]
+        day_end = today_qs.aggregate(end=Max("lesson_time__end_time"))["end"]
 
         return Response({
             "stats": {
                 "total_classes": total_classes,
                 "total_hours": total_hours,
-                "start_time": start_time.strftime("%H:%M") if start_time else None,
-                "end_time": end_time.strftime("%H:%M") if end_time else None,
+                "today_start": day_start.strftime("%H:%M") if day_start else None,
+                "today_end": day_end.strftime("%H:%M") if day_end else None,
             },
-            "days": self.group_by_day(serializer.data)
+            "days": self.group_by_day(serializer.data),
         })
 
     def group_by_day(self, lessons):
-        days = {str(d): [] for d in range(7)}  # 0..6
+        days = {str(d): [] for d in range(7)}
         for lesson in lessons:
             days[str(lesson["day_of_week"])].append(lesson)
         return days
