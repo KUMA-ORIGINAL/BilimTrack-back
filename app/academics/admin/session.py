@@ -75,5 +75,5 @@ class SessionAdmin(BaseModelAdmin):
         if request.user.is_superuser:
             return qs
         elif request.user.role == ROLE_ADMIN:
-            return qs.filter(teacher__organization_id=request.user.organization_id)
+            return qs.filter(subject__organization_id=request.user.organization_id)
         return qs.none()
