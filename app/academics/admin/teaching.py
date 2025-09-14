@@ -29,6 +29,7 @@ class TeachingAdmin(BaseModelAdmin):
         'subject__name',
     )
     autocomplete_fields = ('mentor', 'group', 'subject')
+    list_select_related = ('mentor', 'group', 'subject')
 
     actions_list = ["generate_from_schedule"]
 
