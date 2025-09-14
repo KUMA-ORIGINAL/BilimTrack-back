@@ -14,7 +14,6 @@ class SubjectAdmin(BaseModelAdmin):
     list_display = ('id', 'name', 'description', 'organization', 'display_photo', 'detail_link')
     list_display_links = ('id', 'name')
     search_fields = ('name',)
-    list_filter = ('organization', 'education_level')
 
     @display(description=_("Фото"))
     def display_photo(self, obj):
@@ -22,6 +21,12 @@ class SubjectAdmin(BaseModelAdmin):
             return mark_safe(
                 f'<img src="{obj.photo.url}" height="120" width="120" '
                 f'style="border-radius: 10%;" />')
+
+    def get_list_filter(self, request):
+        list_filter = ('organization', 'education_level')
+        if request.user.role == ROLE_ADMIN:
+            list_filter = ('education_level',)
+        return list_filter
 
     def get_list_display(self, request):
         list_display = ('id', 'name', 'description', 'organization', 'education_level', 'display_photo', 'detail_link')

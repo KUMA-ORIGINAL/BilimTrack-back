@@ -7,9 +7,7 @@ from ..models import Group, EducationLevel
 
 @admin.register(Group)
 class GroupAdmin(BaseModelAdmin):
-    list_display = ('id', 'name', 'points', 'organization', 'education_level', 'detail_link')
     list_display_links = ('id', 'name',)
-    list_filter = ('organization', 'education_level')
     search_fields = ('name',)
     autocomplete_fields = ('course', 'curator')
     list_select_related = ('organization', 'education_level')
@@ -18,6 +16,12 @@ class GroupAdmin(BaseModelAdmin):
         if request.user.role == ROLE_ADMIN:
             return ('points',)
         return ()
+
+    def get_list_filter(self, request):
+        list_filter = ('course', 'education_level', 'organization',)
+        if request.user.role == ROLE_ADMIN:
+            list_filter = ('course', 'education_level')
+        return list_filter
 
     def get_list_display(self, request):
         list_display = ('id', 'name', 'points', 'organization', 'education_level', 'detail_link')

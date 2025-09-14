@@ -7,10 +7,14 @@ from ..models import Course, EducationLevel
 
 @admin.register(Course)
 class CourseAdmin(BaseModelAdmin):
-    list_display = ('id', 'number', 'organization', 'education_level', 'detail_link')
-    list_filter = ('organization', 'education_level')
     search_fields = ('number',)
     list_select_related = ('organization', 'education_level')
+
+    def get_list_filter(self, request):
+        list_filter = ('organization', 'education_level')
+        if request.user.role == ROLE_ADMIN:
+            list_filter = ('education_level',)
+        return list_filter
 
     def get_list_display(self, request):
         list_display = ('id', 'number', 'organization', 'education_level', 'detail_link')

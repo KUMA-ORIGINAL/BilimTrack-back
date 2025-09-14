@@ -1,4 +1,5 @@
 from django.contrib import admin
+from unfold.contrib.filters.admin import RelatedDropdownFilter, ChoicesDropdownFilter
 
 from academics.models import Group, EducationLevel
 from account.models import ROLE_ADMIN
@@ -9,14 +10,7 @@ from ..models import Schedule
 @admin.register(Schedule)
 class ScheduleAdmin(BaseModelAdmin):
     list_display_links = ('id', 'get_groups', 'subject')
-    list_filter = (
-        'day_of_week',
-        'lesson_type',
-        ('groups', admin.RelatedOnlyFieldListFilter),
-        'teacher',
-        'education_level',
-        'organization'
-    )
+    list_filter_submit = True
     search_fields = (
         'subject__name',
         'teacher__full_name',
@@ -24,6 +18,26 @@ class ScheduleAdmin(BaseModelAdmin):
     )
     autocomplete_fields = ('groups', 'subject', 'teacher', 'room', 'lesson_time')
 
+    def get_list_filter(self, request):
+        list_filter = (
+            ('day_of_week', ChoicesDropdownFilter),
+            ('lesson_type', ChoicesDropdownFilter),
+            ('groups', RelatedDropdownFilter),
+            ('teacher', RelatedDropdownFilter),
+            ('groups__course', RelatedDropdownFilter),
+            'education_level',
+            'organization'
+        )
+        if request.user.role == ROLE_ADMIN:
+            list_filter = (
+                ('day_of_week', ChoicesDropdownFilter),
+                ('lesson_type', ChoicesDropdownFilter),
+                ('groups', RelatedDropdownFilter),
+                ('teacher', RelatedDropdownFilter),
+                ('groups__course', RelatedDropdownFilter),
+                'education_level',
+            )
+        return list_filter
 
     @admin.display(description='Группы')
     def get_groups(self, obj):
