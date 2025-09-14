@@ -14,6 +14,7 @@ class SubjectAdmin(BaseModelAdmin):
     list_display = ('id', 'name', 'description', 'organization', 'display_photo', 'detail_link')
     list_display_links = ('id', 'name')
     search_fields = ('name',)
+    list_per_page = 50
 
     @display(description=_("Фото"))
     def display_photo(self, obj):
