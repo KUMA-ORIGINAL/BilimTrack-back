@@ -4,7 +4,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from ..models import Group, Subject, GroupSubjectMentor
+from ..models import Group, Subject, Teaching
 from ..serializers import GroupSerializer, MentorGroupSerializer
 
 
@@ -36,7 +36,7 @@ class GroupViewSet(viewsets.GenericViewSet):
     def mentor_me(self, request):
         subject_id = request.query_params.get('subject_id')
         if not subject_id:
-            return Response({"detail": "SubjectId is required."},
+            return Response({"detail": "subject_id is required."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -45,11 +45,11 @@ class GroupViewSet(viewsets.GenericViewSet):
             return Response({"detail": "Subject not found."},
                             status=status.HTTP_404_NOT_FOUND)
 
-        # ⚡ правильная фильтрация через ManyToMany 'subjects'
-        group_ids = GroupSubjectMentor.objects.filter(
-            subjects=subject,
-            mentor=request.user
-        ).values_list('group_id', flat=True)
+        # ⚡ Получаем группы, где текущий юзер преподаёт этот предмет
+        group_ids = Teaching.objects.filter(
+            mentor=request.user,
+            subject=subject
+        ).values_list('group_id', flat=True).distinct()
 
         groups = Group.objects.filter(id__in=group_ids)
 

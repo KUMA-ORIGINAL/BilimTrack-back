@@ -435,7 +435,7 @@ UNFOLD = {
                     {
                         "title": _("Связки: группа-предмет-наставник"),
                         "icon": "groups",
-                        "link": reverse_lazy("admin:academics_groupsubjectmentor_changelist"),
+                        "link": reverse_lazy("admin:academics_teaching_changelist"),
                     },
                 ]
             },
