@@ -1,12 +1,13 @@
 import datetime
 
+SEMESTER_START = datetime.date(2025, 9, 1)  # начало учебного периода
+
 
 def get_week_type(date=None):
     if date is None:
         date = datetime.date.today()
 
-    # Определяем номер дня месяца и вычисляем неделю
-    week_of_month = (date.day - 1) // 7 + 1
+    # сколько недель прошло с начала учебного года
+    delta_weeks = (date - SEMESTER_START).days // 7
 
-    # нечетные недели -> top, четные -> bottom
-    return 'top' if week_of_month % 2 == 1 else 'bottom'
+    return 'top' if delta_weeks % 2 == 0 else 'bottom'
