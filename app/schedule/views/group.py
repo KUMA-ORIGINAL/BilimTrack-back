@@ -8,6 +8,7 @@ from academics.models import Group
 from schedule.models import Schedule
 from schedule.serializers import GroupSerializer, GroupDetailSerializer, \
     ScheduleGroupShortSerializer, GroupWithScheduleSerializer
+from schedule.utils import get_week_type
 
 
 @extend_schema(tags=['schedule'])
@@ -40,8 +41,12 @@ class GroupViewSet(viewsets.GenericViewSet,
             'subject', 'teacher', 'room', 'lesson_time'
         ).prefetch_related('groups').order_by('lesson_time__start_time')
 
+        # Определяем какая неделя
+        today_week_type = get_week_type()
+
         data = {
             'group': GroupDetailSerializer(group).data,
             'schedule': ScheduleGroupShortSerializer(schedule_qs, many=True).data,
+            'week_type': today_week_type,  # просто добавили в ответ
         }
         return Response(data)
