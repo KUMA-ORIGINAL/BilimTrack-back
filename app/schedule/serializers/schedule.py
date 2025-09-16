@@ -125,6 +125,7 @@ class MentorScheduleSerializer(serializers.ModelSerializer):
             "room",
             "lesson_type",
             "day_of_week",
+            "week_type",
             "day_name",
             "lesson_time",
             "duration_minutes",

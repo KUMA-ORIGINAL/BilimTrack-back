@@ -1,5 +1,7 @@
+import datetime
 from datetime import date
 
+from django.db import models
 from django.db.models import Min, Max
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
@@ -49,6 +51,13 @@ class ScheduleViewSet(viewsets.GenericViewSet,
         serializer.save(organization=self.request.user.organization)
 
 
+def get_week_type(date=None):
+    if date is None:
+        date = datetime.date.today()
+    week_of_month = (date.day - 1) // 7 + 1
+    return "top" if week_of_month % 2 == 1 else "bottom"
+
+
 @extend_schema(tags=['schedule'])
 class MentorScheduleView(APIView):
     permission_classes = [IsAuthenticated]
@@ -56,8 +65,14 @@ class MentorScheduleView(APIView):
     def get(self, request):
         mentor = request.user
 
-        # Получаем все пары текущего ментора
-        qs = Schedule.objects.filter(teacher=mentor).select_related(
+        # Получаем текущий тип недели
+        current_week_type = get_week_type()
+
+        # Получаем все пары текущего ментора с учётом недели
+        qs = Schedule.objects.filter(teacher=mentor).filter(
+            # или "без деления", или текущая неделя
+            models.Q(week_type="weekly") | models.Q(week_type=current_week_type)
+        ).select_related(
             "lesson_time", "room", "subject"
         )
 
@@ -72,13 +87,14 @@ class MentorScheduleView(APIView):
         total_hours = round(total_minutes / 60, 1)
 
         # ---- Время за сегодня ----
-        today = date.today().weekday()  # 0 = понедельник
+        today = datetime.date.today().weekday()  # 0 = понедельник
         today_qs = qs.filter(day_of_week=today)
 
         day_start = today_qs.aggregate(start=Min("lesson_time__start_time"))["start"]
         day_end = today_qs.aggregate(end=Max("lesson_time__end_time"))["end"]
 
         return Response({
+            "week_type": current_week_type,   # <--- чтобы фронт знал какая сейчас неделя
             "stats": {
                 "total_classes": total_classes,
                 "total_hours": total_hours,
