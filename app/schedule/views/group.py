@@ -46,7 +46,7 @@ class GroupViewSet(viewsets.GenericViewSet,
 
         data = {
             'group': GroupDetailSerializer(group).data,
-            'schedule': ScheduleGroupShortSerializer(schedule_qs, many=True).data,
             'week_type': today_week_type,  # просто добавили в ответ
+            'schedule': ScheduleGroupShortSerializer(schedule_qs, many=True).data,
         }
         return Response(data)
