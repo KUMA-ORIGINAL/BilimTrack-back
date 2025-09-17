@@ -20,24 +20,35 @@ class SessionUpdateView(generics.UpdateAPIView,
 
 @extend_schema(
     tags=["Mentor"],
-    summary="Создать или удалить занятие",
-    description="Позволяет ментору создать новое занятие (POST) или удалить своё занятие (DELETE)."
+    summary="Создать занятие",
+    description="Позволяет ментору создать новое занятие (POST)."
 )
-class SessionCreateDeleteView(generics.CreateAPIView,
-                              generics.DestroyAPIView):
+class SessionCreateView(generics.CreateAPIView):
     queryset = Session.objects.all()
     serializer_class = SessionCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    http_method_names = ['post', 'delete']
+    http_method_names = ['post']
+
+
+@extend_schema(
+    tags=["Mentor"],
+    summary="Удалить занятие",
+    description="Позволяет ментору удалить своё занятие (DELETE)."
+)
+class SessionDeleteView(generics.DestroyAPIView):
+    queryset = Session.objects.all()
+    serializer_class = SessionCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        """Разрешаем удалять только свои занятия"""
-        qs = super().get_queryset()
-        if self.request.user.role == 'mentor':
-            return qs.filter(teacher=self.request.user)
-        return qs.none()
+        """Ограничиваем удаление — только свои занятия"""
+        user = self.request.user
+        if user.role == 'mentor':
+            return Session.objects.filter(teacher=user)
+        return Session.objects.none()
 
     def perform_destroy(self, instance):
+        # "мягкое удаление"
         instance.is_active = False
         instance.save()
