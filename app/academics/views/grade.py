@@ -72,6 +72,7 @@ class MentorGradeViewSet(viewsets.GenericViewSet,
             return Response({"error": "group_id and subject_id are required"}, status=400)
 
         sessions = Session.objects.filter(
+            is_active=True,
             subject_id=subject_id,
             groups__id=group_id
         ).order_by('date')
