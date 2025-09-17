@@ -49,6 +49,5 @@ class SessionDeleteView(generics.DestroyAPIView):
         return Session.objects.none()
 
     def perform_destroy(self, instance):
-        # "мягкое удаление"
         instance.is_active = False
         instance.save()
