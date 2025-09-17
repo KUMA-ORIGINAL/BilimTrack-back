@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from account.models import User
 from schedule.models import Schedule
 from schedule.serializers import TeacherSerializer, TeacherWithScheduleSerializer, ScheduleTeacherShortSerializer
+from schedule.utils import get_week_type
 
 
 @extend_schema(tags=['schedule'])
@@ -38,8 +39,12 @@ class TeacherViewSet(viewsets.GenericViewSet,
         schedule_qs = Schedule.objects.filter(teacher=teacher).select_related(
             'subject', 'room', 'lesson_time'
         ).prefetch_related('groups').order_by('lesson_time__start_time')
+
+        today_week_type = get_week_type()
+
         data = {
             'teacher': TeacherSerializer(teacher).data,
+            'week_type': today_week_type,
             'schedule': ScheduleTeacherShortSerializer(schedule_qs, many=True).data,
         }
         return Response(data)

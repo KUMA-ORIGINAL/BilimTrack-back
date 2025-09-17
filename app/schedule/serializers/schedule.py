@@ -84,6 +84,7 @@ class GroupWithScheduleSerializer(serializers.Serializer):
 class TeacherWithScheduleSerializer(serializers.Serializer):
     teacher = TeacherSerializer()
     schedule = ScheduleTeacherShortSerializer(many=True)
+    week_type = serializers.CharField()
 
 
 class ScheduleCreateUpdateSerializer(serializers.ModelSerializer):
