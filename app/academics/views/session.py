@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from drf_spectacular.utils import extend_schema
 from ..models import Session
-from ..serializers import SessionUpdateSerializer, SessionCreateSerializer
+from ..serializers import SessionUpdateSerializer, SessionCreateSerializer, SessionDeleteSerializer
 
 
 @extend_schema(
@@ -38,7 +38,7 @@ class SessionCreateView(generics.CreateAPIView):
 )
 class SessionDeleteView(generics.DestroyAPIView):
     queryset = Session.objects.all()
-    serializer_class = SessionCreateSerializer
+    serializer_class = SessionDeleteSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
