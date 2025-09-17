@@ -24,7 +24,6 @@ urlpatterns = [
     path('attendance/mark/', MarkAttendanceAPIView.as_view(), name='mark-attendance'),
     path('mentor/sessions/<str:pk>/', SessionUpdateView.as_view(), name='session-topic-update'),
     path('mentor/sessions/', SessionCreateView.as_view(), name='session-create'),
-    path('mentor/sessions/<uuid:pk>/', SessionDeleteView.as_view(), name='session-delete'),
 
     # Payments & Make-up
     path('payments/absence/create/', AbsencePaymentCreateAPIView.as_view(), name='absence-payment-create'),
