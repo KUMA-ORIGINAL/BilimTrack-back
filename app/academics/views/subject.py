@@ -24,16 +24,16 @@ class SubjectViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         Получить список предметов для текущего студента
         """
         user = request.user
-        group = getattr(user, "group", None)  # предполагается, что у User есть поле group
+        group = getattr(user, "group", None)  # предполагаем, что у User есть ForeignKey на Group
         if not group:
             return Response(
                 {"detail": "Пользователь не состоит ни в одной группе."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Найдём все предметы для этой группы через «наставник–группа–предмет»
+        # Предметы для этой группы через Teaching
         subjects = Subject.objects.filter(
-            mentor_links__group=group  # mentor_links мы добавляли в GroupSubjectMentor через ManyToMany
+            teaching__group=group
         ).distinct()
 
         serializer = self.get_serializer(subjects, many=True)
