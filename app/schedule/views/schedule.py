@@ -74,7 +74,7 @@ class MentorScheduleView(APIView):
             models.Q(week_type="weekly") | models.Q(week_type=current_week_type)
         ).select_related(
             "lesson_time", "room", "subject"
-        )
+        ).order_by("day_of_week", "lesson_time__start_time")
 
         serializer = MentorScheduleSerializer(qs, many=True)
 
