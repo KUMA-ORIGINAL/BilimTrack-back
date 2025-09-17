@@ -78,7 +78,7 @@ class MentorGradeViewSet(viewsets.GenericViewSet,
         ).order_by('date')
         sessions_data = SessionShortSerializer(sessions, many=True).data
 
-        users = User.objects.filter(group_id=group_id)
+        users = User.objects.filter(group_id=group_id).order_by('last_name', 'first_name')
 
         grades_list = []
         for user in users:
