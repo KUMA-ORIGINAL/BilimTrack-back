@@ -7,7 +7,7 @@ from .views import (GroupViewSet,
                     PerformanceChartView,
                     MentorGradeViewSet, MarkAttendanceAPIView, SubjectMentorViewSet, LessonTopicViewSet)
 from .views.payment import AbsencePaymentCreateAPIView, MakeUpSubmissionAPIView, PaymentWebhookViewSet
-from .views.session import SessionUpdateView, SessionCreateView, SessionDeleteView
+from .views.session import SessionUpdateView, SessionCreateView
 
 router = DefaultRouter()
 router.register(r'groups', GroupViewSet)

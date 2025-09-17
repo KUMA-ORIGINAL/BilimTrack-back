@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from drf_spectacular.utils import extend_schema
 from ..models import Session
-from ..serializers import SessionUpdateSerializer, SessionCreateSerializer, SessionDeleteSerializer
+from ..serializers import SessionUpdateSerializer, SessionCreateSerializer
 
 
 @extend_schema(

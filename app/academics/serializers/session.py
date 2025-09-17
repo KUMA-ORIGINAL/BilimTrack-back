@@ -36,10 +36,3 @@ class SessionCreateSerializer(serializers.ModelSerializer):
         )
         session.groups.set(groups)
         return session
-
-
-class SessionDeleteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Session
-        fields = ('id',)
-        read_only_fields = ('id',)
