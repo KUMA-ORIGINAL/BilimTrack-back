@@ -22,6 +22,7 @@ class ScheduleAdmin(BaseModelAdmin):
         list_filter = (
             ('day_of_week', ChoicesDropdownFilter),
             ('lesson_type', ChoicesDropdownFilter),
+            ('lesson_time', RelatedDropdownFilter),
             ('groups', RelatedDropdownFilter),
             ('teacher', RelatedDropdownFilter),
             ('groups__course', RelatedDropdownFilter),
@@ -32,6 +33,7 @@ class ScheduleAdmin(BaseModelAdmin):
             list_filter = (
                 ('day_of_week', ChoicesDropdownFilter),
                 ('lesson_type', ChoicesDropdownFilter),
+                ('lesson_time', RelatedDropdownFilter),
                 ('groups', RelatedDropdownFilter),
                 ('teacher', RelatedDropdownFilter),
                 ('groups__course', RelatedDropdownFilter),
