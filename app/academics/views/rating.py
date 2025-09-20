@@ -22,6 +22,12 @@ User = get_user_model()
         responses=GroupListSerializer,
         parameters=[
             OpenApiParameter(
+                name='organization_id',
+                description='ID организации (если не задан, берётся организация авторизованного пользователя)',
+                required=False,
+                type=OpenApiTypes.INT
+            ),
+            OpenApiParameter(
                 name='subject_id',
                 description='ID предмета для фильтрации групп',
                 required=False,
@@ -64,6 +70,12 @@ User = get_user_model()
         responses=UserListSerializer,
         parameters=[
             OpenApiParameter(
+                name='organization_id',
+                description='ID организации (если не задан, берётся организация авторизованного пользователя)',
+                required=False,
+                type=OpenApiTypes.INT
+            ),
+            OpenApiParameter(
                 name='subject_id',
                 description='ID предмета для фильтрации студентов',
                 required=False,
@@ -104,7 +116,7 @@ User = get_user_model()
 )
 class RatingViewSet(viewsets.GenericViewSet):
 
-    def _apply_filters(self, queryset, params, is_user=False):
+    def _apply_filters(self, queryset, params, is_user=False, request=None):
         """
         Универсальная функция фильтрации
         """
@@ -114,6 +126,21 @@ class RatingViewSet(viewsets.GenericViewSet):
         teacher_id = params.get("teacher_id")
         start_date = parse_date(params.get("start_date")) if params.get("start_date") else None
         end_date = parse_date(params.get("end_date")) if params.get("end_date") else None
+
+        # --- 🔑 фильтрация по организации ---
+        organization_id = params.get("organization_id")  # сначала пробуем query
+
+        # если в query пусто – пробуем взять из авторизованного пользователя
+        if not organization_id and request and request.user.is_authenticated:
+            organization_id = getattr(request.user, "organization_id", None)
+
+        if organization_id:
+            queryset = queryset.filter(
+                **(
+                    {"group__organization_id": organization_id}
+                    if is_user else {"organization_id": organization_id}
+                )
+            )
 
         if subject_id:
             queryset = queryset.filter(
@@ -141,7 +168,7 @@ class RatingViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['get'], url_path='groups', url_name='groups_rating')
     def groups(self, request):
         groups = Group.objects.all()
-        groups = self._apply_filters(groups, request.query_params, is_user=False)
+        groups = self._apply_filters(groups, request.query_params, is_user=False, request=request)
 
         groups = groups.annotate(
             # используем уже подсчитанные points
@@ -156,7 +183,7 @@ class RatingViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['get'], url_path='users', url_name='users_rating')
     def users(self, request):
         users = User.objects.filter(role="student")
-        users = self._apply_filters(users, request.query_params, is_user=True)
+        users = self._apply_filters(users, request.query_params, is_user=True, request=request)
 
         users = users.annotate(
             total_points=Coalesce("points", 0),   # теперь берём поле points
