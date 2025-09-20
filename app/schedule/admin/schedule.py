@@ -1,6 +1,8 @@
 from django.contrib import admin
 from unfold.contrib.filters.admin import RelatedDropdownFilter, ChoicesDropdownFilter
 
+from academics.admin.filters import MentorDropdownFilter, GroupDropdownFilter, EducationLevelFilter, \
+    LessonTimeDropdownFilter, CourseDropdownFilter
 from academics.models import Group, EducationLevel
 from account.models import ROLE_ADMIN
 from common.admin import BaseModelAdmin
@@ -23,8 +25,8 @@ class ScheduleAdmin(BaseModelAdmin):
             ('day_of_week', ChoicesDropdownFilter),
             ('lesson_type', ChoicesDropdownFilter),
             ('lesson_time', RelatedDropdownFilter),
-            ('groups', RelatedDropdownFilter),
-            ('teacher', RelatedDropdownFilter),
+            ('groups', GroupDropdownFilter),
+            ('teacher', MentorDropdownFilter),
             ('groups__course', RelatedDropdownFilter),
             'education_level',
             'organization'
@@ -33,11 +35,11 @@ class ScheduleAdmin(BaseModelAdmin):
             list_filter = (
                 ('day_of_week', ChoicesDropdownFilter),
                 ('lesson_type', ChoicesDropdownFilter),
-                ('lesson_time', RelatedDropdownFilter),
-                ('groups', RelatedDropdownFilter),
-                ('teacher', RelatedDropdownFilter),
-                ('groups__course', RelatedDropdownFilter),
-                'education_level',
+                ('lesson_time', LessonTimeDropdownFilter),
+                ('groups', GroupDropdownFilter),
+                ('teacher', MentorDropdownFilter),
+                ('groups__course', CourseDropdownFilter),
+                EducationLevelFilter,
             )
         return list_filter
 

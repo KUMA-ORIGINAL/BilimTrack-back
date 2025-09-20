@@ -8,6 +8,7 @@ from unfold.decorators import action
 from account.models import ROLE_ADMIN
 from common.admin import BaseModelAdmin
 from schedule.models import Schedule
+from .filters import GroupDropdownFilter, MentorDropdownFilter, SubjectDropdownFilter
 from ..models import Teaching
 
 
@@ -16,9 +17,9 @@ class TeachingAdmin(BaseModelAdmin):
     list_display = ('id', 'mentor', 'group', 'subject', 'detail_link')
     list_display_links = ('id',)
     list_filter = (
-        ('mentor', RelatedDropdownFilter),
-        ('group', RelatedDropdownFilter),
-        ('subject', RelatedDropdownFilter)
+        ('mentor', MentorDropdownFilter),
+        ('group', GroupDropdownFilter),
+        ('subject', SubjectDropdownFilter),
     )
     list_filter_submit = True
     search_fields = (

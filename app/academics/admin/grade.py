@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from unfold.contrib.filters.admin import RelatedDropdownFilter
-
+from .filters import StudentDropdownFilter, SessionDropdownFilter
 from academics.models import Grade
 from account.models import ROLE_ADMIN
 from common.admin import BaseModelAdmin
@@ -13,8 +12,8 @@ class GradeAdmin(BaseModelAdmin):
     ordering = ('-created_at',)  # сортировка по дате создания
     readonly_fields = ('created_at', 'updated_at')
     list_filter = (
-        ("user", RelatedDropdownFilter),
-        ("session", RelatedDropdownFilter),
+        ("user", StudentDropdownFilter),
+        ("session", SessionDropdownFilter),
         'grade',
         'created_at',
     )

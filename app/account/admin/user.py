@@ -4,13 +4,14 @@ from django.contrib.auth.models import Group
 from import_export.admin import ImportExportModelAdmin
 
 from unfold.admin import ModelAdmin as UnfoldModelAdmin, StackedInline
-from unfold.contrib.filters.admin import RelatedDropdownFilter
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
 from unfold.forms import UserChangeForm, UserCreationForm, AdminPasswordChangeForm
 
+from academics.admin.filters import GroupDropdownFilter
 from common.admin import BaseModelAdmin
 from ..models import User, WorkExperience, Education, ROLE_ADMIN
 from ..resources import StudentResource, MentorResource
+
 
 admin.site.unregister(Group)
 
@@ -53,8 +54,11 @@ class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
     list_select_related = ('organization', 'group')
 
     def get_list_filter(self, request):
-        list_filter = ('role', ("group", RelatedDropdownFilter),
-                       'is_active', 'is_staff',)
+        list_filter = (
+            'role',
+            ("group", GroupDropdownFilter),
+            'is_active', 'is_staff',
+        )
         if request.user.is_superuser:
             return list_filter + ('is_superuser', 'organization',)
         elif request.user.role == ROLE_ADMIN:

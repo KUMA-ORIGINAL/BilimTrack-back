@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from account.models import ROLE_ADMIN
 from common.admin import BaseModelAdmin
+from .filters import CourseFilter, EducationLevelFilter
 from ..models import Group, EducationLevel
 
 
@@ -20,7 +21,7 @@ class GroupAdmin(BaseModelAdmin):
     def get_list_filter(self, request):
         list_filter = ('course', 'education_level', 'organization',)
         if request.user.role == ROLE_ADMIN:
-            list_filter = ('course', 'education_level')
+            list_filter = (EducationLevelFilter, CourseFilter,)
         return list_filter
 
     def get_list_display(self, request):

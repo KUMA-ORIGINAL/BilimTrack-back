@@ -7,6 +7,7 @@ from unfold.decorators import display, action
 
 from account.models import ROLE_ADMIN
 from common.admin import BaseModelAdmin
+from .filters import SubjectDropdownFilter
 from ..models import Session
 from ..services.sessions import generate_sessions_for_date
 
@@ -16,7 +17,11 @@ class SessionAdmin(BaseModelAdmin):
     list_display = ('id', 'subject', 'date', 'display_time', 'is_active', 'detail_link')
     list_display_links = ('id', 'subject')
     search_fields = ('subject__name',)
-    list_filter = ('subject', 'is_active', 'date', 'teacher__organization')
+    list_filter = (
+        ('subject', SubjectDropdownFilter),
+        'is_active',
+        'date',
+    )
     date_hierarchy = 'date'
     autocomplete_fields = ('groups', 'teacher', 'subject', 'topic', 'room')
 

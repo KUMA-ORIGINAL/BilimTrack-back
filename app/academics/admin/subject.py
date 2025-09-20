@@ -6,6 +6,7 @@ from unfold.decorators import display
 
 from account.models import ROLE_ADMIN
 from common.admin import BaseModelAdmin
+from .filters import EducationLevelFilter
 from ..models import Subject, EducationLevel, Semester
 
 
@@ -26,7 +27,7 @@ class SubjectAdmin(BaseModelAdmin):
     def get_list_filter(self, request):
         list_filter = ('organization', 'education_level')
         if request.user.role == ROLE_ADMIN:
-            list_filter = ('education_level',)
+            list_filter = (EducationLevelFilter,)
         return list_filter
 
     def get_list_display(self, request):
