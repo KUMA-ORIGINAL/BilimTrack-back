@@ -4,7 +4,7 @@ from django.db.models.functions import Coalesce
 from django.utils.dateparse import parse_date
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -13,6 +13,7 @@ from academics.serializers import GroupListSerializer
 from account.serializers import UserListSerializer
 
 User = get_user_model()
+
 
 @extend_schema(tags=['Rating'])
 @extend_schema_view(
