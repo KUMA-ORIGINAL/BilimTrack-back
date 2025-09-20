@@ -19,6 +19,8 @@ class ScheduleAdmin(BaseModelAdmin):
         'room__number',
     )
     autocomplete_fields = ('groups', 'subject', 'teacher', 'room', 'lesson_time')
+    list_select_related = ('lesson_type', 'subject', 'teacher', 'room', 'lesson_time', 'education_level', 'organization')
+    show_full_result_count = False
 
     def get_list_filter(self, request):
         list_filter = (
@@ -84,7 +86,11 @@ class ScheduleAdmin(BaseModelAdmin):
         super().save_model(request, obj, form, change)
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request).prefetch_related('groups')
+        qs = super().get_queryset(request).select_related(
+            'lesson_type', 'subject', 'teacher', 'room',
+            'lesson_time', 'education_level', 'organization'
+        ).prefetch_related('groups')
+
         if request.user.is_superuser:
             return qs
         elif request.user.role == ROLE_ADMIN:

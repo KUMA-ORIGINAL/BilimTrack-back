@@ -18,6 +18,7 @@ class GradeAdmin(BaseModelAdmin):
         'created_at',
     )
     autocomplete_fields = ('user', 'session')
+    list_select_related = ('user', 'session')
     list_filter_submit = True
     list_per_page = 50
 

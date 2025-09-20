@@ -57,7 +57,4 @@ class Session(models.Model):
         )
 
     def __str__(self):
-        groups = ", ".join([str(g) for g in self.groups.all()[:3]])
-        if self.groups.count() > 3:
-            groups += "..."
-        return f"{self.subject} [{groups}] | {self.date} {self.start_time}-{self.end_time}"
+        return f"{self.date} {self.start_time}-{self.end_time}"
