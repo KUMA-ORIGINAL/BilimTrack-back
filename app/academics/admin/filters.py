@@ -23,7 +23,6 @@ class EducationLevelFilter(SimpleListFilter):
         if request.user.is_superuser:
             levels = qs
         elif request.user.role == ROLE_ADMIN:
-            # админ видит только уровни для своей организации
             levels = qs.filter(organization_id=request.user.organization_id)
         else:
             levels = qs.none()
