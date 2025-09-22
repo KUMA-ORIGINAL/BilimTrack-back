@@ -150,6 +150,11 @@ class RatingViewSet(viewsets.GenericViewSet):
                 )
             )
 
+        if not course_id and request and request.user.is_authenticated:
+            user = request.user
+            if hasattr(user, "group") and user.group and user.group.course_id:
+                course_id = user.group.course_id
+
         if course_id:
             queryset = queryset.filter(group__course__id=course_id)
 
@@ -164,7 +169,6 @@ class RatingViewSet(viewsets.GenericViewSet):
 
         return queryset
 
-    # Рейтинг групп
     @action(detail=False, methods=['get'], url_path='groups', url_name='groups_rating')
     def groups(self, request):
         groups = Group.objects.all()
@@ -179,7 +183,6 @@ class RatingViewSet(viewsets.GenericViewSet):
         groups_serializer = GroupListSerializer(groups, many=True)
         return Response(groups_serializer.data)
 
-    # Рейтинг пользователей
     @action(detail=False, methods=['get'], url_path='users', url_name='users_rating')
     def users(self, request):
         users = User.objects.filter(role="student")
