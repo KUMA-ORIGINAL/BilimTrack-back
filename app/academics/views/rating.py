@@ -145,8 +145,8 @@ class RatingViewSet(viewsets.GenericViewSet):
         if subject_id:
             queryset = queryset.filter(
                 **(
-                    {"group__subjects__id": subject_id}
-                    if is_user else {"subjects__id": subject_id}
+                    {"group__teaching__subject__id": subject_id}
+                    if is_user else {"teaching__subject__id": subject_id}
                 )
             )
 
