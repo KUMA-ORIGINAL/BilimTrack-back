@@ -23,3 +23,10 @@ class MentorGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'name']
+
+
+class GroupShortSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Group
+        fields = ['id', 'name']

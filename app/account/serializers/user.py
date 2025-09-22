@@ -3,7 +3,7 @@ from django.db.models import Sum
 from rest_framework import serializers
 
 from academics.models import Grade
-from academics.serializers import PerformanceChartSerializer, OrganizationSerializer
+from academics.serializers import PerformanceChartSerializer, OrganizationSerializer, GroupShortSerializer
 from .education import EducationSerializer
 from .skill import SkillSerializer
 from .tool import ToolSerializer
@@ -16,7 +16,7 @@ User = get_user_model()
 
 class MeSerializer(serializers.ModelSerializer):
     achievements = AchievementSerializer(many=True)
-    group = serializers.StringRelatedField()
+    group = GroupShortSerializer()
     performance = serializers.SerializerMethodField()
 
     skills = SkillSerializer(many=True)
