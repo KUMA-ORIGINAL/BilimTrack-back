@@ -156,7 +156,12 @@ class RatingViewSet(viewsets.GenericViewSet):
                 course_id = user.group.course_id
 
         if course_id:
-            queryset = queryset.filter(group__course__id=course_id)
+            queryset = queryset.filter(
+                **(
+                    {"group__course__id": course_id}  # когда фильтруем пользователей (User)
+                    if is_user else {"course__id": course_id}  # когда фильтруем группы (Group)
+                )
+            )
 
         if group_id:
             queryset = queryset.filter(group__id=group_id if is_user else group_id)
