@@ -1,5 +1,7 @@
 import random
 import logging
+import string
+
 from unidecode import unidecode
 
 from django.utils.text import slugify
@@ -199,8 +201,7 @@ class MentorResource(resources.ModelResource):
             username = f"{base_username}{counter}"
             counter += 1
 
-        # --- Генерация PIN
-        pin = str(random.randint(0, 9999)).zfill(4)
+        pin = ''.join(random.choice(string.ascii_lowercase) for _ in range(6))
 
         logger.info(f"✅ Сгенерирован логин={username}, PIN={pin}")
 
