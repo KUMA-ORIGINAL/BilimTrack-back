@@ -6,7 +6,7 @@ from django.db.models import Min, Max
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, filters, mixins
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -30,6 +30,11 @@ class ScheduleViewSet(viewsets.GenericViewSet,
         'teacher__full_name',
         'subject__name', 'room__number'
     ]
+
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+        return [AllowAny()]
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
