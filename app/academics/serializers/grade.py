@@ -14,16 +14,27 @@ class UserShortSerializer(serializers.ModelSerializer):
 
 
 class GradeUpdateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Grade
-        fields = ('id', 'grade')
+        fields = ('id', 'grade', 'attendance')
+
+    def update(self, instance, validated_data):
+        if 'attendance' not in validated_data or validated_data['attendance'] is None:
+            validated_data['attendance'] = "A"
+        return super().update(instance, validated_data)
 
 
 class GradeCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Grade
-        fields = ('id', 'session', 'grade', 'user')
+        fields = ('id', 'session', 'grade', 'attendance', 'user')
+
+    def create(self, validated_data):
+        if 'attendance' not in validated_data or validated_data['attendance'] is None:
+            validated_data['attendance'] = "A"
+        return super().create(validated_data)
 
 
 class GradeShortSerializer(serializers.ModelSerializer):
@@ -34,7 +45,15 @@ class GradeShortSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Grade
-        fields = ('id', 'grade', 'date', 'session_id', 'requires_payment', 'can_submit_make_up')
+        fields = (
+            'id',
+            'grade',
+            'attendance',
+            'date',
+            'session_id',
+            'requires_payment',
+            'can_submit_make_up'
+        )
 
     def get_requires_payment(self, obj):
         return obj.grade == 0
@@ -69,7 +88,7 @@ class AttendanceMarkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Grade
-        fields = ('id', 'session_id', 'user_id', 'grade', 'date')
+        fields = ('id', 'session_id', 'user_id', 'grade', 'attendance', 'date')
 
 
 class AttendanceMarkRequestSerializer(serializers.Serializer):

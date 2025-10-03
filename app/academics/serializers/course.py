@@ -6,4 +6,4 @@ from academics.models import Course
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ["id", "number"]  # или другие поля курса
+        fields = ["id", "number"]

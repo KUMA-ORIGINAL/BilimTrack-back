@@ -138,7 +138,7 @@ class StudentGradeAPIView(generics.RetrieveAPIView):
 class MarkAttendanceAPIView(APIView):
     """
     POST {"session_id": "..."}
-    Отмечает присутствие (grade=5) текущего пользователя на занятии.
+    Отмечает присутствие (attendance="A", grade=5) текущего пользователя на занятии.
     Если отметка уже стоит — ничего не меняет.
     """
     permission_classes = [permissions.IsAuthenticated]
@@ -148,7 +148,7 @@ class MarkAttendanceAPIView(APIView):
         responses={
             200: OpenApiResponse(response=AttendanceMarkSerializer, description="Уже отмечено"),
             201: OpenApiResponse(response=AttendanceMarkSerializer, description="Отметка создана"),
-            400: OpenApiResponse(description="Нет session_id"),
+            400: OpenApiResponse(description="Нет session_id или студент не в группе занятия"),
         }
     )
     def post(self, request):
@@ -158,17 +158,28 @@ class MarkAttendanceAPIView(APIView):
         user = request.user
 
         session = get_object_or_404(Session, id=session_id)
+
+        if not hasattr(user, "group") or user.group_id != session.group_id:
+            return Response(
+                {"detail": "Вы не можете отмечаться на занятии другой группы."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # --- Создание или повторное получение отметки ---
         grade, created = Grade.objects.get_or_create(
             user=user,
             session=session,
-            defaults={'grade': 5}
+            defaults={'attendance': "A",}
         )
 
         already_marked = not created
 
         response_serializer = AttendanceMarkSerializer(grade)
-        return Response({
-            'marked': True,
-            'already_marked': already_marked,
-            **response_serializer.data
-        }, status=status.HTTP_200_OK if already_marked else status.HTTP_201_CREATED)
+        return Response(
+            {
+                "marked": True,
+                "already_marked": already_marked,
+                **response_serializer.data
+            },
+            status=status.HTTP_200_OK if already_marked else status.HTTP_201_CREATED
+        )

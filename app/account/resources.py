@@ -172,7 +172,7 @@ class MentorResource(resources.ModelResource):
         first_name = row.get('first_name', '').strip()
         last_name = row.get('last_name', '').strip()
         patronymic = (row.get("patronymic") or "").strip()
-        organization_id = row.get('organization')
+        organization_id = row.get('organization').strip()
 
         logger.info(
             f"📥 Импортируем МЕНТОРА: {last_name} {first_name} {patronymic}, org={organization_id},"

@@ -8,7 +8,7 @@ from common.admin import BaseModelAdmin
 
 @admin.register(Grade)
 class GradeAdmin(BaseModelAdmin):
-    list_display = ('user', 'session', 'grade', 'comment', 'detail_link')  # отображаемые поля
+    list_display = ('user', 'session', 'grade', 'attendance', 'comment', 'detail_link')  # отображаемые поля
     ordering = ('-created_at',)  # сортировка по дате создания
     readonly_fields = ('created_at', 'updated_at')
     list_filter = (
