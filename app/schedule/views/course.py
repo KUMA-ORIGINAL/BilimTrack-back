@@ -11,7 +11,7 @@ class CourseViewSet(viewsets.GenericViewSet,
                     mixins.ListModelMixin):
     serializer_class = CourseSerializer
     filter_backends = [DjangoFilterBackend,]
-    filterset_fields = ['education_level',]
+    filterset_fields = ['education_level', 'organization']
 
     def get_queryset(self):
         queryset = Course.objects.all()

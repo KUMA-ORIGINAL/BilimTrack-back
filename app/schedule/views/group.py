@@ -19,7 +19,7 @@ class GroupViewSet(viewsets.GenericViewSet,
     """
     serializer_class = GroupSerializer
     filter_backends = [DjangoFilterBackend, ]
-    filterset_fields = ['education_level', ]
+    filterset_fields = ['education_level', 'organization']
 
     def get_queryset(self):
         queryset = Group.objects.all()

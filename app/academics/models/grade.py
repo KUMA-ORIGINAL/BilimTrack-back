@@ -22,7 +22,6 @@ class Grade(models.Model):
         ('A', 'Присутствовал'),
         ('B', 'Отработка'),
         ('C', 'Опоздал'),
-        ('N', 'Не был'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Студент', limit_choices_to={'role': 'student'})
