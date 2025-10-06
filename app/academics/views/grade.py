@@ -159,7 +159,7 @@ class MarkAttendanceAPIView(APIView):
 
         session = get_object_or_404(Session, id=session_id)
 
-        if not hasattr(user, "group") or user.group_id != session.group_id:
+        if not hasattr(user, "group") or not session.groups.filter(id=user.group_id).exists():
             return Response(
                 {"detail": "Вы не можете отмечаться на занятии другой группы."},
                 status=status.HTTP_400_BAD_REQUEST
