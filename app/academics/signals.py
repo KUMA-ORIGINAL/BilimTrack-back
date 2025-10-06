@@ -9,7 +9,7 @@ def remember_old_grade(sender, instance, **kwargs):
     """При сохранении оценки запомним старое значение."""
     if instance.pk:
         try:
-            instance._old_value = Grade.objects.get(pk=instance.pk).grade
+            instance._old_value = Grade.objects.get(pk=instance.pk).total_score
         except Grade.DoesNotExist:
             instance._old_value = None
     else:
@@ -22,10 +22,10 @@ def update_points_on_save(sender, instance, created, **kwargs):
     user = instance.user
 
     if created:  # новая оценка
-        diff = instance.grade
+        diff = instance.grade.total_score
     else:  # обновили существующую
         old_value = instance._old_value or 0
-        diff = instance.grade - old_value
+        diff = instance.grade.total_score - old_value
 
     if diff != 0:
         # обновляем счет у студента
@@ -40,7 +40,7 @@ def update_points_on_save(sender, instance, created, **kwargs):
 def update_points_on_delete(sender, instance, **kwargs):
     """При удалении оценки снимаем её из очков."""
     user = instance.user
-    diff = -instance.grade
+    diff = -instance.grade.total_score
 
     # обновляем счет у студента
     user.__class__.objects.filter(pk=user.pk).update(points=F('points') + diff)
