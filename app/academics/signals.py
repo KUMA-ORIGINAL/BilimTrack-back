@@ -22,10 +22,10 @@ def update_points_on_save(sender, instance, created, **kwargs):
     user = instance.user
 
     if created:  # новая оценка
-        diff = instance.grade.total_score
+        diff = instance.total_score
     else:  # обновили существующую
         old_value = instance._old_value or 0
-        diff = instance.grade.total_score - old_value
+        diff = instance.total_score - old_value
 
     if diff != 0:
         # обновляем счет у студента
@@ -40,7 +40,7 @@ def update_points_on_save(sender, instance, created, **kwargs):
 def update_points_on_delete(sender, instance, **kwargs):
     """При удалении оценки снимаем её из очков."""
     user = instance.user
-    diff = -instance.grade.total_score
+    diff = -instance.total_score
 
     # обновляем счет у студента
     user.__class__.objects.filter(pk=user.pk).update(points=F('points') + diff)
