@@ -63,7 +63,6 @@ class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
     @action(
         description="Экспортировать студентов по группам (XLSX)",
         url_path="changelist-action",
-        permissions=["changelist_action"],
     )
     def changelist_action(self, request):
         # Фильтруем только студентов
