@@ -65,26 +65,36 @@ class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
         url_path="changelist-action",
     )
     def changelist_action(self, request):
-        # Фильтруем только студентов
-        students = self.model.objects.filter(role='student').select_related('group')
+        """
+        Экспорт студентов текущей организации (или всех, если суперпользователь)
+        по группам, каждый в отдельный .xlsx, всё в одном .zip
+        """
+        # Получаем базовый queryset с той же бизнес-логикой, что и get_queryset
+        students = super().get_queryset(request).filter(role='student').select_related('group')
+
+        # Если админ не суперпользователь — фильтруем по его организации
+        if not request.user.is_superuser and request.user.role == ROLE_ADMIN:
+            students = students.filter(organization=request.user.organization)
+
+        # Если вообще нет доступа – возвращаем пустой архив
+        if not students.exists():
+            response = HttpResponse("Нет студентов для экспорта", content_type="text/plain")
+            return response
+
+        # создаем resource и zip-архив
         student_resource = StudentResource()
-
         buffer = io.BytesIO()
-        zip_file = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
+        with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            groups = students.values_list('group__name', flat=True).distinct()
 
-        # Получаем группы студентов
-        groups = students.values_list('group__name', flat=True).distinct()
+            for group_name in groups:
+                users_in_group = students.filter(group__name=group_name)
+                dataset = student_resource.export(users_in_group)
+                xlsx_data = dataset.xlsx
+                file_name = f"{group_name or 'no_group'}.xlsx"
+                zip_file.writestr(file_name, xlsx_data)
 
-        for group_name in groups:
-            users_in_group = students.filter(group__name=group_name)
-            dataset = student_resource.export(users_in_group)
-            xlsx_data = dataset.xlsx
-            file_name = f"{group_name or 'no_group'}.xlsx"
-            zip_file.writestr(file_name, xlsx_data)
-
-        zip_file.close()
         buffer.seek(0)
-
         response = HttpResponse(buffer, content_type="application/zip")
         response["Content-Disposition"] = 'attachment; filename="students_by_groups.zip"'
         return response
