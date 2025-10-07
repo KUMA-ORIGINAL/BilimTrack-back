@@ -65,33 +65,33 @@ class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
         url_path="changelist-action",
     )
     def changelist_action(self, request):
-        """
-        Экспорт студентов текущей организации (или всех, если суперпользователь)
-        по группам, каждый в отдельный .xlsx, всё в одном .zip
-        """
-        # Получаем базовый queryset с той же бизнес-логикой, что и get_queryset
         students = super().get_queryset(request).filter(role='student').select_related('group')
 
-        # Если админ не суперпользователь — фильтруем по его организации
         if not request.user.is_superuser and request.user.role == ROLE_ADMIN:
             students = students.filter(organization=request.user.organization)
 
-        # Если вообще нет доступа – возвращаем пустой архив
         if not students.exists():
-            response = HttpResponse("Нет студентов для экспорта", content_type="text/plain")
-            return response
+            return HttpResponse("Нет студентов для экспорта", content_type="text/plain")
 
-        # создаем resource и zip-архив
         student_resource = StudentResource()
         buffer = io.BytesIO()
-        with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            groups = students.values_list('group__name', flat=True).distinct()
 
-            for group_name in groups:
-                users_in_group = students.filter(group__name=group_name)
+        with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            # Уникальные группы (по ID)
+            groups = (
+                students.values("group_id", "group__name")
+                .distinct()
+                .order_by("group__name")
+            )
+
+            for group in groups:
+                group_id = group["group_id"]
+                group_name = group["group__name"] or "no_group"
+
+                users_in_group = students.filter(group_id=group_id)
                 dataset = student_resource.export(users_in_group)
                 xlsx_data = dataset.xlsx
-                file_name = f"{group_name or 'no_group'}.xlsx"
+                file_name = f"{group_name}.xlsx"
                 zip_file.writestr(file_name, xlsx_data)
 
         buffer.seek(0)
