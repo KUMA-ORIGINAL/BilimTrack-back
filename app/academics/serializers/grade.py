@@ -19,11 +19,6 @@ class GradeUpdateSerializer(serializers.ModelSerializer):
         model = Grade
         fields = ('id', 'grade', 'attendance')
 
-    def update(self, instance, validated_data):
-        if 'attendance' not in validated_data or validated_data['attendance'] is None:
-            validated_data['attendance'] = "A"
-        return super().update(instance, validated_data)
-
 
 class GradeCreateSerializer(serializers.ModelSerializer):
 
@@ -32,7 +27,7 @@ class GradeCreateSerializer(serializers.ModelSerializer):
         fields = ('id', 'session', 'grade', 'attendance', 'user')
 
     def create(self, validated_data):
-        if 'attendance' not in validated_data or validated_data['attendance'] is None:
+        if validated_data.get('grade') is not None:
             validated_data['attendance'] = "A"
         return super().create(validated_data)
 
