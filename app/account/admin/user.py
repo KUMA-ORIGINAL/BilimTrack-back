@@ -1,10 +1,15 @@
+import io
+import zipfile
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
 from django.contrib.auth.models import Group
+from django.http import HttpResponse
 from import_export.admin import ImportExportModelAdmin
 
 from unfold.admin import ModelAdmin as UnfoldModelAdmin, StackedInline
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
+from unfold.decorators import action
 from unfold.forms import UserChangeForm, UserCreationForm, AdminPasswordChangeForm
 
 from academics.admin.filters import GroupDropdownFilter
@@ -52,6 +57,38 @@ class UserAdmin(UserAdmin, BaseModelAdmin, ImportExportModelAdmin):
     list_per_page = 20
     readonly_fields = ('date_joined', 'last_login')
     list_select_related = ('organization', 'group')
+
+    actions_list = ["changelist_action"]
+
+    @action(
+        description="Экспортировать студентов по группам (XLSX)",
+        url_path="changelist-action",
+        permissions=["changelist_action"],
+    )
+    def changelist_action(self, request):
+        # Фильтруем только студентов
+        students = self.model.objects.filter(role='student').select_related('group')
+        student_resource = StudentResource()
+
+        buffer = io.BytesIO()
+        zip_file = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
+
+        # Получаем группы студентов
+        groups = students.values_list('group__name', flat=True).distinct()
+
+        for group_name in groups:
+            users_in_group = students.filter(group__name=group_name)
+            dataset = student_resource.export(users_in_group)
+            xlsx_data = dataset.xlsx
+            file_name = f"{group_name or 'no_group'}.xlsx"
+            zip_file.writestr(file_name, xlsx_data)
+
+        zip_file.close()
+        buffer.seek(0)
+
+        response = HttpResponse(buffer, content_type="application/zip")
+        response["Content-Disposition"] = 'attachment; filename="students_by_groups.zip"'
+        return response
 
     def get_list_filter(self, request):
         list_filter = (
