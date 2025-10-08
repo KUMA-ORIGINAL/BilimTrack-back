@@ -28,6 +28,23 @@ class Organization(models.Model):
         verbose_name='API для мероприятий'
     )
 
+    latitude = models.DecimalField(
+        max_digits=8,
+        decimal_places=5,
+        verbose_name='Широта',
+        default=42.85889
+    )
+    longitude = models.DecimalField(
+        max_digits=8,
+        decimal_places=5,
+        verbose_name='Долгота',
+        default=74.66778
+    )
+    radius_meters = models.PositiveIntegerField(
+        verbose_name='Радиус допустимой зоны (м)',
+        default=100
+    )
+
     def __str__(self):
         return self.name
 
