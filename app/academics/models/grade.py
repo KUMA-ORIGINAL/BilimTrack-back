@@ -55,11 +55,31 @@ class Grade(models.Model):
 
     @property
     def total_score(self):
-        """Суммарный балл (посещение + активность)"""
-        attend_score = {
+        """
+        Итоговый балл по системе:
+            10 × вес × (оценка / 5)
+        Если оценки нет или 0 → базовый балл за посещение:
+            A=5, B=4, C=4, N=0
+        """
+        weights = {
+            'A': 1.0,
+            'B': 0.9,
+            'C': 0.8,
+            'N': 0.0,
+        }
+        base_points = {
             'A': 5,
             'B': 4,
-            'C': 3,
+            'C': 4,
             'N': 0,
-        }.get(self.attendance, 0)
-        return attend_score + (self.grade or 0)
+        }
+
+        weight = weights.get(self.attendance, 0.0)
+        grade = self.grade or 0
+
+        if grade > 0:
+            result = 10 * weight * (grade / 5)
+        else:
+            result = base_points.get(self.attendance, 0)
+
+        return round(result)
