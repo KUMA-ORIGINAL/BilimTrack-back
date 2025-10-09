@@ -34,7 +34,7 @@ class GradeAdmin(BaseModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'session', 'grade', 'comment')
+            'fields': ('user', 'session', 'grade', 'attendance', 'comment')
         }),
         ('Таймстемпы', {
             'fields': ('created_at', 'updated_at'),

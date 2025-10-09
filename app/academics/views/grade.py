@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiResponse
 from rest_framework import viewsets, permissions, mixins, generics, status
@@ -71,21 +73,71 @@ class MentorGradeViewSet(viewsets.GenericViewSet,
         if not group_id or not subject_id:
             return Response({"error": "group_id and subject_id are required"}, status=400)
 
-        sessions = Session.objects.filter(
-            is_active=True,
-            subject_id=subject_id,
-            groups__id=group_id
-        ).order_by('date')
+        # Загружаем все нужные сессии с учетом групп
+        sessions = (
+            Session.objects.filter(
+                is_active=True,
+                subject_id=subject_id,
+                groups__id=group_id
+            )
+            .order_by('date')
+            .distinct()
+        )
+
         sessions_data = SessionShortSerializer(sessions, many=True).data
 
+        # Пользователи группы
         users = User.objects.filter(group_id=group_id).order_by('last_name', 'first_name')
 
+        # Сегодняшняя дата
+        today = timezone.localdate()
+        today_str = today.strftime("%d-%m-%Y")
+
+        # Сессии за сегодня (по дате)
+        today_sessions = sessions.filter(date=today)
+        today_session_ids = list(today_sessions.values_list('id', flat=True))
+
+        # Один запрос на подсчет посещений
+        attendance_count_query = (
+            Grade.objects.filter(
+                session_id__in=today_session_ids,
+                attendance__in=['A', 'C']
+            )
+            .values('session_id')
+            .annotate(count=Count('id'))
+        )
+        attendance_count_dict = {
+            str(item['session_id']): item['count']
+            for item in attendance_count_query
+        }
+
+        for s in sessions_data:
+            session_id_str = s['id']
+            if session_id_str in attendance_count_dict:
+                s['attendance_count'] = attendance_count_dict[session_id_str]
+            elif s['date'] == today_str:
+                s['attendance_count'] = 0
+            else:
+                s['attendance_count'] = None
+
+        # Загружаем все оценки сразу — одним запросом
+        grades = (
+            Grade.objects.filter(session__in=sessions, user__in=users)
+            .select_related('session', 'user')
+        )
+
+        # Группируем оценки по пользователям (в Python)
+        grades_by_user = {}
+        for grade in grades:
+            grades_by_user.setdefault(grade.user_id, []).append(grade)
+
+        # Собираем итоговую структуру
         grades_list = []
         for user in users:
-            grades = Grade.objects.filter(user=user, session__in=sessions)
+            user_grades = grades_by_user.get(user.id, [])
             user_data = {
                 "user": UserShortSerializer(user).data,
-                "scores": GradeShortSerializer(grades, many=True).data
+                "scores": GradeShortSerializer(user_grades, many=True).data
             }
             grades_list.append(user_data)
 

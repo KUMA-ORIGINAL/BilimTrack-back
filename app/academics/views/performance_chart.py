@@ -33,7 +33,6 @@ class PerformanceChartView(APIView):
 
         grades_qs = Grade.objects.filter(user=user)
 
-        # если пришёл фильтр по предмету
         if subject_id:
             grades_qs = grades_qs.filter(session__subject_id=subject_id)
 
