@@ -19,9 +19,9 @@ from ..serializers import PerformanceChartSerializer
                 location=OpenApiParameter.QUERY,
                 required=False,
                 description="ID предмета для фильтрации графика"
-            )
+            ),
         ],
-        responses=PerformanceChartSerializer
+        responses=PerformanceChartSerializer,
     )
 )
 class PerformanceChartView(APIView):
@@ -29,24 +29,23 @@ class PerformanceChartView(APIView):
 
     def get(self, request):
         user = request.user
-        subject_id = request.query_params.get("subject_id")  # Например ?subject_id=123
+        subject_id = request.query_params.get("subject_id")
 
         grades_qs = Grade.objects.filter(user=user)
-
         if subject_id:
             grades_qs = grades_qs.filter(session__subject_id=subject_id)
 
-        grades = (grades_qs
-                  .values('session__date')
-                  .annotate(total_score=Sum('grade'))
-                  .order_by('session__date'))
+        # Получаем данные в Python, чтобы использовать property total_score
+        chart_dict = {}
+        for g in grades_qs.select_related("session"):
+            date = g.session.date.strftime("%Y-%m-%d")
+            chart_dict.setdefault(date, 0)
+            chart_dict[date] += g.total_score
 
-        chart_data = []
-        for grade in grades:
-            chart_data.append({
-                'date': grade['session__date'].strftime('%Y-%m-%d'),
-                'score': grade['total_score'],
-            })
+        chart_data = [
+            {"date": date, "score": score}
+            for date, score in sorted(chart_dict.items())
+        ]
 
         serialized_data = PerformanceChartSerializer(chart_data, many=True).data
         return Response(serialized_data)
