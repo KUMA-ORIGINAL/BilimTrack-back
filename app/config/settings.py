@@ -36,7 +36,7 @@ DEBUG = bool(env("DEBUG", default=0))
 
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
 
-DOMAIN = env("DOMAIN")
+DOMAINS = env("DOMAINS").split()
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
@@ -184,7 +184,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = [f"https://{DOMAIN}", f"http://{DOMAIN}"]
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{domain}" for domain in DOMAINS
+] + [
+    f"http://{domain}" for domain in DOMAINS
+]
+
 
 AUTH_USER_MODEL = 'account.User'
 
