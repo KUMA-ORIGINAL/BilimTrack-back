@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Count
+from django.db.models import Count, OuterRef, Exists
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
@@ -8,7 +8,7 @@ from rest_framework import viewsets, permissions, mixins, generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..models import Grade, Session
+from ..models import Grade, Session, Payment
 from ..permissions import IsMentorOrReadOnly
 from ..serializers import GradeUpdateSerializer, GradeCreateSerializer, SessionShortSerializer, \
     UserShortSerializer, GradeShortSerializer, AttendanceMarkRequestSerializer, AttendanceMarkSerializer, \
@@ -120,10 +120,16 @@ class MentorGradeViewSet(viewsets.GenericViewSet,
             else:
                 s['attendance_count'] = None
 
-        # Загружаем все оценки сразу — одним запросом
+        paid_subquery = Payment.objects.filter(
+            user=OuterRef('user'),
+            grade=OuterRef('pk'),
+            status=Payment.Status.PAID
+        )
+
         grades = (
             Grade.objects.filter(session__in=sessions, user__in=users)
             .select_related('session', 'user')
+            .annotate(has_paid=Exists(paid_subquery))
         )
 
         # Группируем оценки по пользователям (в Python)

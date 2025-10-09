@@ -68,7 +68,7 @@ class AbsencePaymentCreateAPIView(APIView):
 
         redirect_url = f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')}/payments/{payment.id}/success"
         # pay_url = generate_payment_link(payment, redirect_url=redirect_url)
-        pay_url = 'https://paylink.bakai.kg/25dc79fe-eca4-4e50-a02a-bbf91e332828'
+        pay_url = 'https://bilimtrack.makalabox.com/'
 
         if not payment.payment_link:
             payment.payment_link = pay_url

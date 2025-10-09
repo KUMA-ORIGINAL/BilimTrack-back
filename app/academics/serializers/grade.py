@@ -54,7 +54,7 @@ class GradeShortSerializer(serializers.ModelSerializer):
         return obj.grade == 0
 
     def get_can_submit_make_up(self, obj):
-        return Payment.objects.filter(user=obj.user, grade=obj, status=Payment.Status.PAID).exists()
+        return getattr(obj, 'has_paid', False)
 
 
 class SessionShortSerializer(serializers.ModelSerializer):
