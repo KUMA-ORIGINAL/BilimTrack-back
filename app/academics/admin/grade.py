@@ -8,7 +8,17 @@ from common.admin import BaseModelAdmin
 
 @admin.register(Grade)
 class GradeAdmin(BaseModelAdmin):
-    list_display = ('user', 'session', 'grade', 'attendance', 'comment', 'created_at', 'detail_link')  # отображаемые поля
+    list_display = (
+        'user',
+        'session',
+        'session_teacher',
+        'session_subject',
+        'grade',
+        'attendance',
+        'comment',
+        'created_at',
+        'detail_link'
+    )
     ordering = ('-created_at',)  # сортировка по дате создания
     readonly_fields = ('created_at', 'updated_at')
     list_filter = (
@@ -18,7 +28,7 @@ class GradeAdmin(BaseModelAdmin):
         'created_at',
     )
     autocomplete_fields = ('user', 'session')
-    list_select_related = ('user', 'session')
+    list_select_related = ('user', 'session__subject', 'session__teacher')
     list_filter_submit = True
     list_per_page = 50
 
@@ -31,6 +41,17 @@ class GradeAdmin(BaseModelAdmin):
             'classes': ('collapse',),  # сворачиваемая секция
         }),
     )
+
+    def session_subject(self, obj):
+        return obj.session.subject
+
+    session_subject.short_description = "Предмет"
+
+    def session_teacher(self, obj):
+        teacher = obj.session.teacher
+        return teacher.get_full_name() if hasattr(teacher, "get_full_name") else str(teacher)
+
+    session_teacher.short_description = "Преподаватель"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
