@@ -120,7 +120,11 @@ class StudentGradeAPIView(generics.RetrieveAPIView):
         if not subject_id:
             return Response({'error': 'subject_id is required'}, status=400)
 
-        sessions = Session.objects.filter(subject_id=subject_id, groups=user.group).order_by('date')
+        sessions = Session.objects.filter(
+            is_active=True,
+            subject_id=subject_id,
+            groups=user.group
+        ).order_by('date')
         sessions_data = SessionShortSerializer(sessions, many=True).data
 
         grades = Grade.objects.filter(user=user, session__in=sessions)
