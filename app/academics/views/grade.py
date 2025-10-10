@@ -13,6 +13,7 @@ from ..permissions import IsMentorOrReadOnly
 from ..serializers import GradeUpdateSerializer, GradeCreateSerializer, SessionShortSerializer, \
     UserShortSerializer, GradeShortSerializer, AttendanceMarkRequestSerializer, AttendanceMarkSerializer, \
     SessionAndGradeSerializer
+from ..services.grade import send_grade_update
 
 User = get_user_model()
 
@@ -234,14 +235,14 @@ class MarkAttendanceAPIView(APIView):
             defaults={'attendance': "A",}
         )
 
-        already_marked = not created
+        send_grade_update(user, session, grade, created)
 
         response_serializer = AttendanceMarkSerializer(grade)
         return Response(
             {
                 "marked": True,
-                "already_marked": already_marked,
+                "already_marked": not created,
                 **response_serializer.data
             },
-            status=status.HTTP_200_OK if already_marked else status.HTTP_201_CREATED
+            status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED
         )

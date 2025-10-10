@@ -21,3 +21,10 @@ Unidecode==1.4.0
 requests==2.32.3
 django-debug-toolbar==5.2.0
 
+sentry-sdk[django]==2.26.1
+
+channels==4.2.0
+channels-redis==4.2.1
+daphne==4.1.2
+uvicorn==0.34.0
+websockets==14.2

@@ -13,8 +13,10 @@ from datetime import timedelta
 from pathlib import Path
 
 import environ
+import sentry_sdk
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +41,7 @@ ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
 DOMAINS = env("DOMAINS").split()
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(" ")
 CORS_ALLOW_HEADERS = ["Authorization", "Content-Type", "Accept"]
 
 if DEBUG:
@@ -54,6 +56,8 @@ else:
 
 
 INSTALLED_APPS = [
+    'daphne',
+
     'unfold',
     "unfold.contrib.filters",
     "unfold.contrib.import_export",
@@ -74,6 +78,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'cachalot',
     'import_export',
+    'channels',
 
     'account',
     'academics',
@@ -114,6 +119,7 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 
 # Database
@@ -183,6 +189,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if not DEBUG:
+    sentry_sdk.init(
+        dsn=env('SENTRY_DSN'),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.5,
+        send_default_pii=True,
+        environment="production",
+    )
+
 
 CSRF_TRUSTED_ORIGINS = [
     f"https://{domain}" for domain in DOMAINS
@@ -276,6 +292,15 @@ CACHES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": ['redis://redis:6379/2'],
+        },
+    },
+}
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'BilimTrack',
     'DESCRIPTION': 'Your project description',
@@ -287,6 +312,11 @@ SPECTACULAR_SETTINGS = {
     'POSTPROCESSING_HOOKS': [
         'drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields',
     ],
+
+    'SERVE_PUBLIC': True,
+    'SERVE_HTTPS': True,
+    'SERVE_PERMISSIONS': ['config.permissions.IsSuperUser'],
+    'SERVE_AUTHENTICATION': ['rest_framework.authentication.SessionAuthentication',]
 }
 
 REST_FRAMEWORK = {

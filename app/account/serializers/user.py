@@ -135,7 +135,8 @@ class MeUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserListSerializer(serializers.ModelSerializer):
+    group = GroupShortSerializer()
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'photo', 'points', 'rating')
+        fields = ('username', 'first_name', 'last_name', 'photo', 'points', 'rating', 'group')
