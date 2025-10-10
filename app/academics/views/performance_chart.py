@@ -1,4 +1,3 @@
-from django.db.models import Sum
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
@@ -31,31 +30,25 @@ class PerformanceChartView(APIView):
         user = request.user
         subject_id = request.query_params.get("subject_id")
 
-        # Фильтрация оценок:
-        # - только пользователя
-        # - только активные занятия
-        # - только занятия, где группа пользователя присутствует в session.groups M2M
         grades_qs = Grade.objects.filter(
             user=user,
             session__is_active=True,
             session__groups=user.group,
-        )
+        ).select_related('session', 'session__subject')
 
-        # Если передан subject_id — фильтруем по нему
         if subject_id:
             grades_qs = grades_qs.filter(session__subject_id=subject_id)
 
-        # Группировка по дате
-        chart_dict = {}
-        for g in grades_qs.select_related("session"):
-            date = g.session.date.strftime("%Y-%m-%d")
-            chart_dict.setdefault(date, 0)
-            chart_dict[date] += g.total_score
+        chart_data = []
+        for g in grades_qs:
+            chart_data.append({
+                "date": g.session.date.strftime("%Y-%m-%d"),
+                "subject": g.session.subject.name,
+                "session_id": g.session.id,
+                "score": g.total_score,
+            })
 
-        chart_data = [
-            {"date": date, "score": score}
-            for date, score in sorted(chart_dict.items())
-        ]
+        chart_data.sort(key=lambda x: (x["date"], x["session_id"]))
 
         serialized_data = PerformanceChartSerializer(chart_data, many=True).data
         return Response(serialized_data)
