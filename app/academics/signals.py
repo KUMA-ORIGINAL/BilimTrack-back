@@ -1,50 +1,54 @@
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.db.models import F
 from django.dispatch import receiver
+from django.db import transaction
 from .models import Grade
+
+
+class GradeService:
+    @staticmethod
+    def update_user_points(user_id, diff):
+        from account.models import User
+        if diff:
+            User.objects.filter(pk=user_id).update(points=F("points") + diff)
+
+    @staticmethod
+    def update_group_points(group_id, diff):
+        from academics.models import Group
+        if group_id and diff:
+            Group.objects.filter(pk=group_id).update(points=F("points") + diff)
+
+    @classmethod
+    def handle_grade_change(cls, grade, old_score=0, is_delete=False):
+        diff = -grade.total_score if is_delete else grade.total_score - old_score
+        if diff:
+            with transaction.atomic():
+                cls.update_user_points(grade.user_id, diff)
+                group_id = getattr(grade.user, "group_id", None)
+                if group_id:
+                    cls.update_group_points(group_id, diff)
 
 
 @receiver(pre_save, sender=Grade)
 def remember_old_grade(sender, instance, **kwargs):
-    """При сохранении оценки запомним старое значение."""
+    """Сохраняем старое значение, чтобы потом посчитать разницу."""
     if instance.pk:
-        try:
-            instance._old_value = Grade.objects.get(pk=instance.pk).total_score
-        except Grade.DoesNotExist:
-            instance._old_value = None
+        old = Grade.objects.filter(pk=instance.pk).only("total_score").first()
+        instance._old_total_score = old.total_score if old else 0
     else:
-        instance._old_value = None
+        instance._old_total_score = 0
 
 
 @receiver(post_save, sender=Grade)
-def update_points_on_save(sender, instance, created, **kwargs):
-    """После сохранения корректируем баллы студента и группы."""
-    user = instance.user
-
-    if created:  # новая оценка
-        diff = instance.total_score
-    else:  # обновили существующую
-        old_value = instance._old_value or 0
-        diff = instance.total_score - old_value
-
-    if diff != 0:
-        # обновляем счет у студента
-        user.__class__.objects.filter(pk=user.pk).update(points=F('points') + diff)
-
-        # обновляем счет у группы, если есть
-        if user.group_id:
-            user.group.__class__.objects.filter(pk=user.group_id).update(points=F('points') + diff)
+def update_points_on_save(sender, instance, created, raw=False, **kwargs):
+    """Пересчитывает баллы пользователя/группы после изменения оценки."""
+    if raw:  # skip loaddata
+        return
+    old_score = 0 if created else getattr(instance, "_old_total_score", 0)
+    GradeService.handle_grade_change(instance, old_score)
 
 
 @receiver(post_delete, sender=Grade)
 def update_points_on_delete(sender, instance, **kwargs):
-    """При удалении оценки снимаем её из очков."""
-    user = instance.user
-    diff = -instance.total_score
-
-    # обновляем счет у студента
-    user.__class__.objects.filter(pk=user.pk).update(points=F('points') + diff)
-
-    # обновляем счет у группы, если есть
-    if user.group_id:
-        user.group.__class__.objects.filter(pk=user.group_id).update(points=F('points') + diff)
+    """Корректирует баллы при удалении записи."""
+    GradeService.handle_grade_change(instance, is_delete=True)

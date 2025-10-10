@@ -201,7 +201,7 @@ class StudentGradeAPIView(generics.RetrieveAPIView):
 class MarkAttendanceAPIView(APIView):
     """
     POST {"session_id": "..."}
-    Отмечает присутствие (attendance="A", grade=5) текущего пользователя на занятии.
+    Отмечает присутствие (attendance="A") текущего пользователя на занятии.
     Если отметка уже стоит — ничего не меняет.
     """
     permission_classes = [permissions.IsAuthenticated]
@@ -209,40 +209,49 @@ class MarkAttendanceAPIView(APIView):
     @extend_schema(
         request=AttendanceMarkRequestSerializer,
         responses={
-            200: OpenApiResponse(response=AttendanceMarkSerializer, description="Уже отмечено"),
-            201: OpenApiResponse(response=AttendanceMarkSerializer, description="Отметка создана"),
+            200: OpenApiResponse(AttendanceMarkSerializer, description="Отметка уже существовала"),
+            201: OpenApiResponse(AttendanceMarkSerializer, description="Создана новая отметка"),
             400: OpenApiResponse(description="Нет session_id или студент не в группе занятия"),
-        }
+        },
     )
     def post(self, request):
-        serializer = AttendanceMarkRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        session_id = serializer.validated_data['session_id']
-        user = request.user
+        req_ser = AttendanceMarkRequestSerializer(data=request.data)
+        req_ser.is_valid(raise_exception=True)
+        session_id = req_ser.validated_data["session_id"]
 
-        session = get_object_or_404(Session, id=session_id)
-
-        if not hasattr(user, "group") or not session.groups.filter(id=user.group_id).exists():
-            return Response(
-                {"detail": "Вы не можете отмечаться на занятии другой группы."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # --- Создание или повторное получение отметки ---
-        grade, created = Grade.objects.get_or_create(
-            user=user,
-            session=session,
-            defaults={'attendance': "A",}
+        # подгружаем пользователя с группой, чтобы не было лишних SELECT
+        user = (
+            request.user.__class__.objects
+            .select_related("group")
+            .only("id", "group_id")
+            .get(pk=request.user.pk)
         )
 
-        send_grade_update(user, session, grade, created)
+        session = get_object_or_404(
+            Session.objects.prefetch_related("groups").only("id"),
+            id=session_id,
+        )
 
-        response_serializer = AttendanceMarkSerializer(grade)
+        if not user.group_id or not session.groups.filter(id=user.group_id).exists():
+            return Response(
+                {"detail": "Вы не можете отмечаться на занятии другой группы."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        grade, created = (
+            Grade.objects.select_related("user", "session")
+            .get_or_create(user=user, session=session, defaults={"attendance": "A"})
+        )
+
+        if created:
+            send_grade_update(user, session, grade, created)
+
+        resp_ser = AttendanceMarkSerializer(grade)
         return Response(
             {
                 "marked": True,
                 "already_marked": not created,
-                **response_serializer.data
+                **resp_ser.data,
             },
-            status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
         )

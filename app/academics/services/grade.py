@@ -29,7 +29,7 @@ def send_grade_update(user, session, grade, created=False):
             data = {
                 "student_id": user.id,
                 "student_name": f"{user.full_name}",
-                "session_id": session.id,
+                "session_id": str(session.id),
                 "attendance": grade.attendance,
                 "created": created,
             }
