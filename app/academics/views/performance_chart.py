@@ -31,11 +31,21 @@ class PerformanceChartView(APIView):
         user = request.user
         subject_id = request.query_params.get("subject_id")
 
-        grades_qs = Grade.objects.filter(user=user)
+        # Фильтрация оценок:
+        # - только пользователя
+        # - только активные занятия
+        # - только занятия, где группа пользователя присутствует в session.groups M2M
+        grades_qs = Grade.objects.filter(
+            user=user,
+            session__is_active=True,
+            session__groups=user.group,
+        )
+
+        # Если передан subject_id — фильтруем по нему
         if subject_id:
             grades_qs = grades_qs.filter(session__subject_id=subject_id)
 
-        # Получаем данные в Python, чтобы использовать property total_score
+        # Группировка по дате
         chart_dict = {}
         for g in grades_qs.select_related("session"):
             date = g.session.date.strftime("%Y-%m-%d")
