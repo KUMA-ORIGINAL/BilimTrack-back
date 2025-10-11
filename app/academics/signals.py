@@ -33,7 +33,7 @@ class GradeService:
 def remember_old_grade(sender, instance, **kwargs):
     """Сохраняем старое значение, чтобы потом посчитать разницу."""
     if instance.pk:
-        old = Grade.objects.filter(pk=instance.pk).only("total_score").first()
+        old = Grade.objects.filter(pk=instance.pk).only("grade", "attendance").first()
         instance._old_total_score = old.total_score if old else 0
     else:
         instance._old_total_score = 0
